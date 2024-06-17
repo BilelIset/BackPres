@@ -1,0 +1,6 @@
+tn\isetsf\presence\Controller\UserController.class
+tn\isetsf\presence\CorsConfig.class
+tn\isetsf\presence\Repository\UserRepo.class
+tn\isetsf\presence\Entity\Users.class
+tn\isetsf\presence\PresenceApplication.class
+tn\isetsf\presence\Entity\Resp.class
