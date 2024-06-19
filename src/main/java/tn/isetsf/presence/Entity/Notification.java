@@ -22,8 +22,6 @@ public class Notification {
     @JoinColumn(name = "enseignant_id")
     private Enseignant enseignant;
 
-    @ManyToOne
-    @JoinColumn(name = "ligne_absence_id")
-    private LigneAbsence ligne_absence;
+
 
 }

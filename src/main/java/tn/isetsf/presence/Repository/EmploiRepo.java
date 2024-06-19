@@ -7,8 +7,8 @@ import tn.isetsf.presence.Entity.Emploi;
 import java.util.List;
 
 public interface EmploiRepo extends JpaRepository<Emploi,String> {
-    @Query("SELECT e FROM Emploi e WHERE e.jour1 = :jrs AND e.salle1= :salle AND e.seance1= :seance")
-    List<Emploi> trouverEnsi(String jrs,String salle,String seance);
+    @Query("SELECT e FROM Emploi e WHERE e.jour1 = :jrs AND e.nom_salle = :salle1 AND e.seance1= :seance ")
+    List<Emploi> trouverEnsi(String jrs,String salle1,String seance);
 
 
 

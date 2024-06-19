@@ -1,35 +1,30 @@
 package tn.isetsf.presence.Entity;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
 public class LigneAbsence {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idAbsence;
-
-    private Date dateJour;
-    private String observation;
-    private LocalDateTime dateHeureEnregistrement;
-
-    @ManyToOne
-    @JoinColumn(name = "salle_id")
-    private Salle salle1;
-
-    @ManyToOne
-    @JoinColumn(name = "enseignant_id")
-    private Enseignant ensi1;
-
-
+@Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ligne_absence_seq")
+    @SequenceGenerator(name = "ligne_absence_seq", sequenceName = "ligne_absence_seq", allocationSize = 1)
+    private Long num;
+    private String nom_salle;
+    private String nom_matiere;
+    private String ensi1;
+    private String nom_seance;
+    private String annee1;
+    private String semestre1;
+    private String nom_jour;
+    private LocalDate date;
 
 }
+
+
