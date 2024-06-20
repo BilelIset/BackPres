@@ -2,6 +2,7 @@ package tn.isetsf.presence.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +24,16 @@ public class LigneEmploiController {
     @GetMapping(value = "/absence",produces = MediaType.APPLICATION_JSON_VALUE)
     public List<LigneAbsence> getAbscece(){
         return absenceRepoRepo.findAll();
+    }
+    @DeleteMapping(value = "/absence/delete")
+    public Boolean deleteAbsence(){
+        try {
+            absenceRepoRepo.deleteAll();
+            return true;
+
+        }catch (Exception e){
+            return false;
+        }
     }
 
 }

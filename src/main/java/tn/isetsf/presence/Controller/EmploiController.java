@@ -26,8 +26,8 @@ public class EmploiController {
         return (ArrayList<Emploi>) emploiRepo.findAll();
     }
     @GetMapping(value = "/emploi/ensi")
-    public Boolean getEnsi(@RequestParam String jour,@RequestParam String salle,@RequestParam String seance){
-        List<Emploi> emploi= emploiRepo.trouverEnsi(jour, salle, seance);
+    public Boolean getEnsi(@RequestParam String jour,@RequestParam String salle,@RequestParam String seance,@RequestParam String seanceDouble){
+        List<Emploi> emploi= emploiRepo.trouverEnsi(jour, salle, seance,seanceDouble);
         LigneAbsence ligneAbsence=new LigneAbsence();
         if(!emploi.isEmpty()){
             for(Emploi emploi1:emploi){
@@ -38,6 +38,7 @@ public class EmploiController {
                 ligneAbsence.setNom_salle(emploi1.getNom_salle());
                  ligneAbsence.setNom_matiere(emploi1.getNom_matiere());
                  ligneAbsence.setNom_seance(emploi1.getNom_seance());
+                 ligneAbsence.setSeanceDouble(emploi1.getSeance1());
                  ligneAbsence.setDate(LocalDate.now());
 
             }

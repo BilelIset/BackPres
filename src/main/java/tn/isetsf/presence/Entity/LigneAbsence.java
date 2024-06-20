@@ -20,6 +20,7 @@ public class LigneAbsence {
     private String nom_matiere;
     private String ensi1;
     private String nom_seance;
+    private String seanceDouble;
     private String annee1;
     private String semestre1;
     private String nom_jour;
