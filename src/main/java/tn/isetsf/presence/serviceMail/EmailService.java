@@ -16,7 +16,7 @@ public class EmailService {
         message.setTo(to);
         message.setSubject(subject);
         message.setText(text);
-        message.setFrom("no-reply@apirest.tech");
+        message.setFrom("noreply@apirest.tech");
 
         mailSender.send(message);
     }
