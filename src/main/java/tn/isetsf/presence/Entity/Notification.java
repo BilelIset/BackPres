@@ -18,9 +18,7 @@ public class Notification {
 
     private Date date_notif;
 
-    @ManyToOne
-    @JoinColumn(name = "enseignant_id")
-    private Enseignant enseignant;
+
 
 
 

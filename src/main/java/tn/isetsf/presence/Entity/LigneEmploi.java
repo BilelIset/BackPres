@@ -24,9 +24,7 @@ public class LigneEmploi {
     @JoinColumn(name = "salle_id")
     private Salle salle1;
 
-    @ManyToOne
-    @JoinColumn(name = "enseignant_id")
-    private Enseignant ensi1;
+
 
     private String nomSalle;
     private String matiere1;

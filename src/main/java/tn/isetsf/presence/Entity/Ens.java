@@ -13,10 +13,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Enseignant {
+public class Ens {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_enseignant;
+    private String matEnseignant;
+
+    private String nomEnseignant;
+    private String depEnseignant;
+
 
     private String email_enseignant;
     private String tel_enseignant;
