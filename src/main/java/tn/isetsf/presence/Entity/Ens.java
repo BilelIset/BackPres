@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Immutable;
 
 @Data
 @AllArgsConstructor
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Ens {
     @Id
+
     private String matEnseignant;
 
     private String nomEnseignant;

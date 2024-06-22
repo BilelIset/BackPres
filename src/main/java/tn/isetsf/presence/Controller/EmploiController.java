@@ -2,12 +2,11 @@ package tn.isetsf.presence.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tn.isetsf.presence.Entity.Emploi;
 import tn.isetsf.presence.Entity.Ens;
 import tn.isetsf.presence.Entity.LigneAbsence;
+import tn.isetsf.presence.Entity.Users;
 import tn.isetsf.presence.Repository.EmploiRepo;
 import tn.isetsf.presence.Repository.EnstRepo;
 import tn.isetsf.presence.Repository.LigneAbsenceRepo;
@@ -19,6 +18,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @RestController
+@CrossOrigin("*")
 public class EmploiController {
     @Autowired
     EnstRepo enstRepo;
@@ -59,6 +59,18 @@ public class EmploiController {
              return true;
          }
         else {
+            return false;
+        }
+    }
+    @PutMapping(value = ("/ens/update"),consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Boolean updateUser(@RequestParam Long mat, @RequestBody Ens ens){
+        Optional<Ens> ens1 =enstRepo.findById(String.valueOf(mat));
+        if(ens1.isPresent()){
+            ens1.get().setEmail_enseignant(ens.getEmail_enseignant());
+            ens1.get().setTel_enseignant(ens.getTel_enseignant());
+            enstRepo.save(ens1.get());
+            return true;
+        }else {
             return false;
         }
     }
