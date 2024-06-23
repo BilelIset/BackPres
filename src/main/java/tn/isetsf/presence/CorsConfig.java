@@ -16,7 +16,7 @@ public class CorsConfig implements WebMvcConfigurer {
                     .allowedOrigins("*") // Mettez ici l'URL de votre application frontend
                     .allowedMethods("GET", "POST", "PUT", "DELETE")
                     .allowedHeaders("*")
-                    .allowCredentials(true); // Permettre les cookies, si nécessaire
+                    .allowCredentials(false); // Permettre les cookies, si nécessaire
         }
     }
 
