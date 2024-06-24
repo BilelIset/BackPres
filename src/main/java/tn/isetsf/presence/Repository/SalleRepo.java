@@ -14,4 +14,5 @@ public interface SalleRepo extends JpaRepository<Salle,Integer> {
     @Query("SELECT COUNT(s) FROM Salle s WHERE  s.nomdepsalle=:nomdep")
     Integer getNbreSalleParDep(String nomdep);
 
+
 }

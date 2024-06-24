@@ -15,7 +15,6 @@ public class CalculDate {
         char[] ls=now.toString().trim().toCharArray();
         if(ls[0]=='M'){
             index=1;
-            System.out.println(index);
         }if(ls[0]=='T'&&ls[1]=='u'){
             index=2;
         }if(ls[0]=='W'){
@@ -103,7 +102,6 @@ public class CalculDate {
             char[] ls=dayOfWeek.toString().trim().toCharArray();
             if(ls[0]=='M'){
                 index=1;
-                System.out.println(index);
             }if(ls[0]=='T'&&ls[1]=='U'){
                 index=2;
             }if(ls[0]=='W'){
@@ -119,7 +117,7 @@ public class CalculDate {
             }if(ls[0]=='S'&&ls[1]=='U'){
                 index=7;
             }
-            System.out.println(index);
+
 
 
             return index;
