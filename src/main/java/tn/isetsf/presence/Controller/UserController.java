@@ -10,6 +10,7 @@ import tn.isetsf.presence.Entity.Users;
 import tn.isetsf.presence.Repository.UserRepo;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -22,15 +23,19 @@ public class UserController {
 
 
     @PostMapping(value = "/login/add", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Users addUser(@RequestBody Users users) {
+    public Boolean addUser(@RequestBody Users users) {
+        Users users1=userRepo.findByLogin(users.getLogin());
+        if(users1!=null){
+            return false;
+        }else{
         try {
             userRepo.save(users);
-            return users;
+            return true;
         } catch (Exception e) {
-            e.printStackTrace();
+
             return null;
         }
-    }
+    }}
 
     @PostMapping(value = "/login/all", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Users> getAll() {
@@ -61,22 +66,27 @@ public class UserController {
 
 
     @PostMapping("/login")
-    public Resp logUser(@RequestBody Users user) {
+    public Resp logApp(@RequestBody Users user) {
         Resp res = new Resp();
         res.setAdmin(false);
         res.setStatue(false);
+        System.out.println("Response créée");
 
         Optional<Users> us1 = userRepo.findByLoginAndPassword(user.getLogin(), user.getPassword());
 
         if (us1.isPresent()) {
-            Users foundUser = us1.get();
-            if (foundUser.getIsAdmin()) {
+            System.out.println("Premier if");
+
+            if (us1.get().getIsAdmin()) {
+                System.out.println("Deuxième if");
                 res.setAdmin(true);
-                res.setStatue(true);
-            } else {
-                res.setStatue(true);
             }
+
+            res.setStatue(true);
+            return res;
         }
+
         return res;
     }
+
 }
