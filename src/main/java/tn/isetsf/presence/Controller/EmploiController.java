@@ -32,7 +32,7 @@ public class EmploiController {
         return (ArrayList<Emploi>) emploiRepo.findAll();
     }
 
-    @GetMapping(value = "/ens",produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/ens",produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Ens> getEnseignant(){
          return enstRepo.findAll();
 

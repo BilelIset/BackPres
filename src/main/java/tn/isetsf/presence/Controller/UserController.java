@@ -32,7 +32,7 @@ public class UserController {
         }
     }
 
-    @GetMapping(value = "/login/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/login/all", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Users> getAll() {
         return userRepo.findAll();
     }

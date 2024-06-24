@@ -3,10 +3,7 @@ package tn.isetsf.presence.Controller;
 import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tn.isetsf.presence.CalculDate;
 import tn.isetsf.presence.Entity.Emploi;
 import tn.isetsf.presence.Entity.Salle;
@@ -25,7 +22,7 @@ public class SalleController {
     EmploiRepo emploiRepo;
     CalculDate calculDate=new CalculDate();
 
-    @GetMapping(value = "/salle",produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/salle",produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Salle> getSalle(){
 
         return salleRepo.findAll();

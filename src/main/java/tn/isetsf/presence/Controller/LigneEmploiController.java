@@ -2,10 +2,7 @@ package tn.isetsf.presence.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tn.isetsf.presence.CalculDate;
 import tn.isetsf.presence.Entity.Emploi;
 import tn.isetsf.presence.Entity.LigneAbsence;
@@ -21,7 +18,7 @@ import java.util.*;
 public class LigneEmploiController {
     @Autowired
     LigneAbsenceRepo absenceRepoRepo;
-    @GetMapping(value = "/absence",produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/absence",produces = MediaType.APPLICATION_JSON_VALUE)
     public List<LigneAbsence> getAbscece(){
         return absenceRepoRepo.findAll();
     }
