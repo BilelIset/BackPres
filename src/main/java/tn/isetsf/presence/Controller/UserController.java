@@ -56,6 +56,24 @@ public class UserController {
             return null;
         }
     }
+    @PostMapping(value = "/get/user" ,consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Users getUser( @RequestBody Users user){
+        return userRepo.findByLogin(user.getLogin());
+
+    }
+    @PutMapping(value = "/update/psw" ,consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Boolean updateAgent(@RequestParam int idUser, @RequestBody Users user){
+        System.out.println("données recu : "+idUser+" "+ user.toString());
+
+        Optional<Users> users=userRepo.findById(idUser);
+        try {
+            users.get().setPassword(user.getPassword());
+            userRepo.save(users.get());
+            return true;
+        }catch (Exception e){
+            return false;
+        }
+    }
 
     @DeleteMapping(value = "/login/delete")
     public Boolean deleteUser(@RequestParam int idUser) {

@@ -25,6 +25,7 @@ public class LigneAbsence {
     private String semestre1;
     private String nom_jour;
     private LocalDate date;
+    private Boolean notified;
 
 }
 

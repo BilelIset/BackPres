@@ -14,7 +14,7 @@ import tn.isetsf.presence.Repository.LigneEmploiRepo;
 import java.util.*;
 
 @RestController
-
+@CrossOrigin("*")
 public class LigneEmploiController {
     @Autowired
     LigneAbsenceRepo absenceRepoRepo;

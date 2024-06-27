@@ -1,18 +1,11 @@
 package tn.isetsf.presence;
 
-import net.bytebuddy.agent.VirtualMachine;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import tn.isetsf.presence.Controller.UserController;
 import tn.isetsf.presence.Entity.Users;
 import tn.isetsf.presence.Repository.UserRepo;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,22 +15,15 @@ class PresenceApplicationTests {
 	static Users users=new Users("test","test",false);
 	@Autowired
 	 UserRepo userRepo;
-
-
 	@Test
 	void contextLoads() {
 		List<Users> list=userRepo.findAll();
 		System.out.println(list.toString());
-
-
-
-		Optional<Users> us1 = userRepo.findByLoginAndPassword("bilel","123456");
-
+		Optional<Users> us1 = userRepo.findByLoginAndPassword("aaaaa","bbbbb");
 				if(us1.isPresent()){
 					System.out.println(("existe "));
 				}else {
 					System.out.println(("n'existe pas "));
-
 				}
 		Optional<Users> us2 = userRepo.findByLoginAndPassword("bbb","254");
 
@@ -54,12 +40,7 @@ class PresenceApplicationTests {
 			System.out.println("Erreur utilisateur non inséré");
 		}
 		apres();
-
-
 	}
-
-
-
      void apres(){
 		try {
 			Optional<Users> usTest=userRepo.findById(users.getIdUser());
@@ -79,8 +60,5 @@ class PresenceApplicationTests {
 		}catch (Exception e){
 			System.out.println("erreur utilisateur n'est pas inséré");
 		}
-
-
 	}
-
 }

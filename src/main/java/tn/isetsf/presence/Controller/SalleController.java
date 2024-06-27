@@ -1,16 +1,13 @@
 package tn.isetsf.presence.Controller;
 
-import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import tn.isetsf.presence.CalculDate;
-import tn.isetsf.presence.EmploiProjection;
 import tn.isetsf.presence.Entity.Emploi;
 import tn.isetsf.presence.Entity.Salle;
 import tn.isetsf.presence.Repository.EmploiRepo;
 import tn.isetsf.presence.Repository.SalleRepo;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,9 +23,10 @@ public class SalleController {
     @PostMapping(value = "/salle", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Salle> getSalle() {
         List<Salle> salleList = new ArrayList<>();
-        List<EmploiProjection> emplois = emploiRepo.trouverCren(String.valueOf(calculDate.indexJour()), String.valueOf(calculDate.getSeance()), String.valueOf(calculDate.getSeanceDouble()));
-        System.out.println("index de jour = "+String.valueOf(calculDate.indexJour()) +" seance simple = "+ String.valueOf(calculDate.getSeance())+" seance double= "+String.valueOf(calculDate.getSeanceDouble()));
-        for (EmploiProjection emploi : emplois) {
+        List<Emploi> emplois = emploiRepo.trouverCren(String.valueOf(calculDate.getYear()),
+                String.valueOf(calculDate.getSemestre()),String.valueOf(calculDate.indexJour()),"1","7");
+System.out.println("requete recue pour salle");
+        for (Emploi emploi : emplois) {
             Salle salle = new Salle();
             salle.setNom_salle(emploi.getNom_salle());
             salle.setSalle1(Integer.parseInt(emploi.getSalle1()));
@@ -37,14 +35,4 @@ public class SalleController {
         }
         return salleList;
     }
-
-    @GetMapping(value = "/dep",produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Salle> getSalleParDep(@RequestParam String nomdep) {
-        return salleRepo.getdept(nomdep);
-    }
-    @GetMapping(value = "/dep/nbre",produces = MediaType.APPLICATION_JSON_VALUE)
-    public Integer getNbreSalleParDEp(@RequestParam String nomdep) {
-        return salleRepo.getNbreSalleParDep(nomdep);
-    }
-
 }
