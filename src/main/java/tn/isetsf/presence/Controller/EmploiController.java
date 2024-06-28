@@ -64,6 +64,7 @@ public class EmploiController {
 
             }
            try {
+
                ligneAbsence.setNotified( emailController.sendEmail(ens.get().getEmail_enseignant(), "Service Scolarité ISET SFAX : Notification d'absence", msg));
 ligneAbsence.setNotified(true);
            }catch (Exception ignored){

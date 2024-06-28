@@ -20,7 +20,7 @@ public class SalleController {
     EmploiRepo emploiRepo;
     CalculDate calculDate=new CalculDate();
 
-    @PostMapping(value = "/salle", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/salle/pointage", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Salle> getSalle() {
         List<Salle> salleList = new ArrayList<>();
         List<Emploi> emplois = emploiRepo.trouverCren(String.valueOf(calculDate.getYear()),
@@ -34,5 +34,9 @@ System.out.println("requete recue pour salle");
             salleList.add(salle);
         }
         return salleList;
+    }
+    @PostMapping(value = "/salle", produces = MediaType.APPLICATION_JSON_VALUE)
+public List<Salle> getAll(){
+        return salleRepo.findAll();
     }
 }
