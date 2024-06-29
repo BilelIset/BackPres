@@ -24,7 +24,7 @@ public class SalleController {
     public List<Salle> getSalle() {
         List<Salle> salleList = new ArrayList<>();
         List<Emploi> emplois = emploiRepo.trouverCren(String.valueOf(calculDate.getYear()),
-                String.valueOf(calculDate.getSemestre()),String.valueOf(calculDate.indexJour()),String.valueOf(calculDate.getSeance()),String.valueOf(calculDate.getSeanceDouble()));
+                String.valueOf(calculDate.getSemestre()),String.valueOf(calculDate.indexJour()),"1","7");
 System.out.println("requete recue pour salle");
         for (Emploi emploi : emplois) {
             Salle salle = new Salle();
