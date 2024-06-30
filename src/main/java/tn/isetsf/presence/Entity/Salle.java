@@ -14,4 +14,6 @@ public class Salle {
     private int salle1;
     private String nom_salle;
     private  String nomdepsalle;
+    private String seanceDouble;
+    private String nomSeance;
 }

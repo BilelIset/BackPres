@@ -1,8 +1,10 @@
 package tn.isetsf.presence.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import tn.isetsf.presence.CalculDate;
 import tn.isetsf.presence.Entity.Emploi;
 import tn.isetsf.presence.Entity.Ens;
 import tn.isetsf.presence.Entity.LigneAbsence;
@@ -25,8 +27,10 @@ public class EmploiController {
     LigneAbsenceRepo ligneAbsenceRepo;
     @Autowired
     EmploiRepo emploiRepo;
+
     @Autowired
     private  EmailController emailController;
+    CalculDate calculDate=new CalculDate();
 
     @GetMapping(value = "/emploi/all",produces = MediaType.APPLICATION_JSON_VALUE)
     public ArrayList<Emploi> getAllEmploi(){
@@ -43,41 +47,64 @@ public class EmploiController {
 
 
     @GetMapping(value = "/emploi/creneau")
-    public Boolean getEnsi(@RequestParam String jour,@RequestParam String salle,@RequestParam String seance,@RequestParam String seanceDouble){
-        List<Emploi> emploi= emploiRepo.trouverCreneau(jour, salle, seance,seanceDouble);
-        LigneAbsence ligneAbsence=new LigneAbsence();
-        Boolean notified=false;
-      Optional<Ens> ens=  enstRepo.findById(emploi.get(0).getEnsi1());
-      String msg="Mr "+ens.get().getNomEnseignant() + "On vous informe que vous etes  absent le : " +LocalDate.now()+" à la salle : " +salle+" seances de :" + emploi.get(0).getNom_seance();
+    public Boolean getEnsi(@RequestParam String jour,@RequestParam String salle,@RequestParam String seance,@RequestParam String seanceDouble) {
+        List<Emploi> emploi = emploiRepo.trouverCreneau(String.valueOf(calculDate.getSemestre()), jour, salle, seance, seanceDouble);
 
-       if(!emploi.isEmpty()){
-            for(Emploi emploi1:emploi){
-                ligneAbsence.setEnsi1(emploi1.getEnsi1());
-                ligneAbsence.setNom_jour(emploi1.getNom_jour());
-                ligneAbsence.setAnnee1(emploi1.getAnnee1());
-                ligneAbsence.setSemestre1(emploi1.getSemestre1());
-                ligneAbsence.setNom_salle(emploi1.getNom_salle());
-                 ligneAbsence.setNom_matiere(emploi1.getNom_matiere());
-                 ligneAbsence.setNom_seance(emploi1.getNom_seance());
-                 ligneAbsence.setSeanceDouble(emploi1.getSeance1());
-                 ligneAbsence.setDate(LocalDate.now());
 
+
+
+
+        LigneAbsence ligneAbsence = new LigneAbsence();
+        if (!emploi.isEmpty()) {
+System.out.println("emploi trouvé"+emploi.get(0).toString());
+System.out.println("salle = "+emploi.get(0).getNom_salle()+" seance =  "+emploi.get(0).getSeance1()+" enseigant =  "+ emploi.get(0).getEnsi1());
+            if (!ligneAbsenceRepo.trouverAbsence( emploi.get(0).getNom_salle(),emploi.get(0).getSeance1(), emploi.get(0).getEnsi1()).isEmpty()) {
+                System.out.println("Ligne absence  déja existante");
+                return false;
+            } else {
+                System.out.println("Nouvelle Ligne absence");
+
+
+
+        Boolean notified = false;
+
+            Optional<Ens> ens = enstRepo.findById(emploi.get(0).getEnsi1());
+
+            String msg = "Mr " + ens.get().getNomEnseignant() + "On vous informe que vous etes  absent le : " + LocalDate.now() + " à la salle : " + salle + " seances de :" + emploi.get(0).getNom_seance();
+
+
+                for (Emploi emploi1 : emploi) {
+                    ligneAbsence.setEnsi1(emploi1.getEnsi1());
+                    ligneAbsence.setNom_jour(emploi1.getNom_jour());
+                    ligneAbsence.setAnnee1(emploi1.getAnnee1());
+                    ligneAbsence.setSemestre1(emploi1.getSemestre1());
+                    ligneAbsence.setNom_salle(emploi1.getNom_salle());
+                    ligneAbsence.setNom_matiere(emploi1.getNom_matiere());
+                    ligneAbsence.setNom_seance(emploi1.getNom_seance());
+                    ligneAbsence.setSeanceDouble(emploi1.getSeance1());
+                    ligneAbsence.setDate(LocalDate.now());
+
+                }
+                try {
+
+                    ligneAbsence.setNotified(emailController.sendEmail(ens.get().getEmail_enseignant(), "Service Scolarité ISET SFAX : Notification d'absence", msg));
+
+                } catch (Exception ignored) {
+
+                }
+                ligneAbsenceRepo.save(ligneAbsence);
+                System.out.println("ligne absence ajouté" + ligneAbsence.toString());
+
+                return true;
+            }} else {
+            System.out.println("Aucun creneau trouver !!");
+                return false;
             }
-           try {
 
-               ligneAbsence.setNotified( emailController.sendEmail(ens.get().getEmail_enseignant(), "Service Scolarité ISET SFAX : Notification d'absence", msg));
-ligneAbsence.setNotified(true);
-           }catch (Exception ignored){
-               ligneAbsence.setNotified(false);
-           }
-           ligneAbsenceRepo.save(ligneAbsence);
-           System.out.println("ligne absence ajouté"+ligneAbsence.toString());
-
-             return true;
-         }
-        else {
-            return false;
-       }
+    }
+    @GetMapping(value = "/lbs",produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<LigneAbsence> getLigneAbsnce(@RequestParam String salle, @RequestParam String seance, @RequestParam String ens){
+        return ligneAbsenceRepo.trouverAbsence(seance,salle,ens);
     }
     @PutMapping(value = ("/ens/update"),consumes = MediaType.APPLICATION_JSON_VALUE)
     public Boolean updateUser(@RequestParam Long mat, @RequestBody Ens ens){

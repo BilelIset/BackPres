@@ -27,6 +27,7 @@ public class LigneAbsence {
     private LocalDate date;
     private Boolean notified;
 
+
 }
 
 

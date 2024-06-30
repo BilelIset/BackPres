@@ -43,7 +43,7 @@ System.out.println(mat);
         try {
             emailService.sendSimpleEmail(to, subject, text);
             System.out.println("succes d'envoie à : " + to);
-            Optional<LigneAbsence> ligneAbsence=ligneAbsenceRepo.findById(mat);
+            Optional<LigneAbsence> ligneAbsence=ligneAbsenceRepo.findById(Long.valueOf(mat));
             ligneAbsence.get().setNotified(true);
             ligneAbsenceRepo.save(ligneAbsence.get());
 
