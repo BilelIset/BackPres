@@ -76,11 +76,11 @@ public class CalculDate {
         } else if (!time.isBefore(LocalTime.of(10, 0)) && time.isBefore(LocalTime.of(13, 20))) {
             return 8;
         } else if (!time.isBefore(LocalTime.of(11, 45)) && time.isBefore(LocalTime.of(15, 0))) {
-            return 9;
-        } else if (!time.isBefore(LocalTime.of(13, 20)) && time.isBefore(LocalTime.of(16, 45))) {
-            return 10;
-        } else if (!time.isBefore(LocalTime.of(14, 55)) && time.isBefore(LocalTime.of(19, 0))) {
             return 11;
+        } else if (!time.isBefore(LocalTime.of(13, 20)) && time.isBefore(LocalTime.of(16, 45))) {
+            return 9;
+        } else if (!time.isBefore(LocalTime.of(14, 55)) && time.isBefore(LocalTime.of(20, 0))) {
+            return 10;
         } else {
             return 0;
         }
