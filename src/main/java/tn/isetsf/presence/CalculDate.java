@@ -62,7 +62,7 @@ public class CalculDate {
             return 4;
         } else if (!time.isBefore(LocalTime.of(14, 55)) && time.isBefore(LocalTime.of(16, 25))) {
             return 5;
-        } else if (!time.isBefore(LocalTime.of(16, 30)) && time.isBefore(LocalTime.of(19, 0))) {
+        } else if (!time.isBefore(LocalTime.of(16, 30)) && time.isBefore(LocalTime.of(18, 0))) {
             return 6;
         } else {
             return 0;
@@ -79,7 +79,7 @@ public class CalculDate {
             return 11;
         } else if (!time.isBefore(LocalTime.of(13, 20)) && time.isBefore(LocalTime.of(16, 45))) {
             return 9;
-        } else if (!time.isBefore(LocalTime.of(14, 55)) && time.isBefore(LocalTime.of(20, 0))) {
+        } else if (!time.isBefore(LocalTime.of(14, 55)) && time.isBefore(LocalTime.of(18, 0))) {
             return 10;
         } else {
             return 0;
