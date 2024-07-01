@@ -79,7 +79,7 @@ public class CalculDate {
             return 9;
         } else if (!time.isBefore(LocalTime.of(13, 20)) && time.isBefore(LocalTime.of(16, 45))) {
             return 10;
-        } else if (!time.isBefore(LocalTime.of(14, 55)) && time.isBefore(LocalTime.of(18, 0))) {
+        } else if (!time.isBefore(LocalTime.of(14, 55)) && time.isBefore(LocalTime.of(19, 0))) {
             return 11;
         } else {
             return 0;
