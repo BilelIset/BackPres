@@ -54,15 +54,15 @@ public class CalculDate {
         LocalTime time = LocalTime.now();
         if (time.isAfter(LocalTime.of(8, 15)) && time.isBefore(LocalTime.of(9, 45))) {
             return 1;
-        } else if (time.isAfter(LocalTime.of(10, 0)) && time.isBefore(LocalTime.of(11, 30))) {
+        } else if (time.isAfter(LocalTime.of(9, 45)) && time.isBefore(LocalTime.of(11, 30))) {
             return 2;
-        } else if (time.isAfter(LocalTime.of(11, 45)) && time.isBefore(LocalTime.of(13, 15))) {
+        } else if (time.isAfter(LocalTime.of(11, 30)) && time.isBefore(LocalTime.of(13, 15))) {
             return 3;
-        } else if (time.isAfter(LocalTime.of(13, 20)) && time.isBefore(LocalTime.of(14, 50))) {
+        } else if (time.isAfter(LocalTime.of(13, 15)) && time.isBefore(LocalTime.of(14, 50))) {
             return 4;
-        } else if (time.isAfter(LocalTime.of(14, 55)) && time.isBefore(LocalTime.of(16, 25))) {
+        } else if (time.isAfter(LocalTime.of(14, 50)) && time.isBefore(LocalTime.of(16, 25))) {
             return 5;
-        } else if (time.isAfter(LocalTime.of(16, 30)) && time.isBefore(LocalTime.of(18, 0))) {
+        } else if (time.isAfter(LocalTime.of(16, 25)) && time.isBefore(LocalTime.of(18, 0))) {
             return 6;
         } else {
             return 0;
@@ -71,13 +71,13 @@ public class CalculDate {
 
     public int getSeanceDouble() {
         LocalTime time = LocalTime.now();
-        if (time.isAfter(LocalTime.of(7, 0)) && time.isBefore(LocalTime.of(10, 0))) {
+        if (time.isAfter(LocalTime.of(8, 15)) && time.isBefore(LocalTime.of(11, 30))) {
             return 7;
-        } else if (time.isAfter(LocalTime.of(10, 0)) && time.isBefore(LocalTime.of(13, 20))) {
+        } else if (time.isAfter(LocalTime.of(9, 45)) && time.isBefore(LocalTime.of(13, 15))) {
             return 8;
-        } else if (time.isAfter(LocalTime.of(11, 45)) && time.isBefore(LocalTime.of(15, 0))) {
+        } else if (time.isAfter(LocalTime.of(11, 30)) && time.isBefore(LocalTime.of(15, 50))) {
             return 11;
-        } else if (time.isAfter(LocalTime.of(13, 20)) && time.isBefore(LocalTime.of(16, 45))) {
+        } else if (time.isAfter(LocalTime.of(13, 15)) && time.isBefore(LocalTime.of(16, 25))) {
             return 9;
         } else if (time.isAfter(LocalTime.of(14, 55)) && time.isBefore(LocalTime.of(18, 0))) {
             return 10;
