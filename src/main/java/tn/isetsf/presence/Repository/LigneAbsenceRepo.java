@@ -8,6 +8,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface LigneAbsenceRepo extends JpaRepository<LigneAbsence,Long> {
-    @Query("SELECT l FROM LigneAbsence l WHERE l.nom_salle= :salle AND  l.seanceDouble= :seance AND l.ensi1= :enseignant")
-    List<LigneAbsence> trouverAbsence(  String salle,String seance,String enseignant);
+    @Query("SELECT l FROM LigneAbsence l WHERE l.date=:date AND l.nom_salle= :salle AND  l.seanceDouble= :seance AND l.ensi1= :enseignant")
+    List<LigneAbsence> trouverAbsence( LocalDate date, String salle,String seance,String enseignant);
 }

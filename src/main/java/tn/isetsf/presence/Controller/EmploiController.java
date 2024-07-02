@@ -58,7 +58,7 @@ public class EmploiController {
         if (!emploi.isEmpty()) {
 System.out.println("emploi trouvé"+emploi.get(0).toString());
 System.out.println("salle = "+emploi.get(0).getNom_salle()+" seance =  "+emploi.get(0).getSeance1()+" enseigant =  "+ emploi.get(0).getEnsi1());
-            if (!ligneAbsenceRepo.trouverAbsence( emploi.get(0).getNom_salle(),emploi.get(0).getSeance1(), emploi.get(0).getEnsi1()).isEmpty()) {
+            if (!ligneAbsenceRepo.trouverAbsence( LocalDate.now(),emploi.get(0).getNom_salle(),emploi.get(0).getSeance1(), emploi.get(0).getEnsi1()).isEmpty()) {
                 System.out.println("Ligne absence  déja existante");
                 return false;
             } else {
@@ -104,7 +104,7 @@ System.out.println("salle = "+emploi.get(0).getNom_salle()+" seance =  "+emploi.
     }
     @GetMapping(value = "/lbs",produces = MediaType.APPLICATION_JSON_VALUE)
     public List<LigneAbsence> getLigneAbsnce(@RequestParam String salle, @RequestParam String seance, @RequestParam String ens){
-        return ligneAbsenceRepo.trouverAbsence(seance,salle,ens);
+        return ligneAbsenceRepo.trouverAbsence(LocalDate.now(),seance,salle,ens);
     }
     @PutMapping(value = ("/ens/update"),consumes = MediaType.APPLICATION_JSON_VALUE)
     public Boolean updateUser(@RequestParam Long mat, @RequestBody Ens ens){
