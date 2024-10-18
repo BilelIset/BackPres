@@ -1,11 +1,13 @@
 package tn.isetsf.presence.webThymeleaf;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
+import tn.isetsf.presence.serviceMail.EmailService;
 
 import java.util.Objects;
 
@@ -13,6 +15,8 @@ import java.util.Objects;
 public class ServerStatusService {
 
     private final RestTemplate restTemplate = new RestTemplate();
+    @Autowired
+    EmailService emailService;
 
     public boolean checkMobileAppServerStatus(String url) {
 
@@ -29,23 +33,16 @@ public class ServerStatusService {
             return false;
 
         }}
-    public boolean checkMailServer(String url) {
+    public boolean checkMailServer() {
         try {
-            // Envoyer la requête à l'URL Actuator
-            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-
-            // Vérifier si la réponse contient "DOWN"
-            boolean isDown = Objects.requireNonNull(response.getBody()).contains("DOWN");
-
-            // Afficher le statut dans la console pour diagnostic
-            System.out.println("Status Actuator contient 'DOWN' : " + isDown);
-
-            // Retourner false si "DOWN", sinon true
-            return isDown;
+            System.out.println("Envoie de email en cours ");
+           emailService.sendSimpleEmail("bilelbenabdallah31@gmail.com","Test","Test lors de chargement de la page dashboard sur le status de mail server");
+           System.out.println("Success d'envoies");
+            return true;
 
         } catch (Exception e) {
-            // Gérer les exceptions (par ex: URL incorrecte, serveur inaccessible, etc.)
-            System.err.println("Erreur lors de la vérification du serveur de messagerie : " + e.getMessage());
-            return false; // Considérer que le serveur est hors service si une exception survient
+            System.out.println("Echec d'envoie email");
+            e.printStackTrace();
+            return false;
         }
     }}

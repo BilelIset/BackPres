@@ -17,6 +17,7 @@ import tn.isetsf.presence.Entity.LigneAbsence;
 import tn.isetsf.presence.Repository.EnstRepo;
 import tn.isetsf.presence.Repository.LigneAbsenceRepo;
 import tn.isetsf.presence.Repository.SalleRepo;
+import tn.isetsf.presence.serviceMail.EmailService;
 
 import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
@@ -32,14 +33,13 @@ public class AdminController {
     private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
 
-
     private final LigneAbsenceRepo ligneAbsenceRepo;
     private final EnstRepo enstRepo;
     private final SalleRepo salleRepo;
     private final ServerStatusService serverStatusService;
     private final CalculDate calculDate = new CalculDate();
 
-    public AdminController(LigneAbsenceRepo ligneAbsenceRepo, EnstRepo enstRepo, SalleRepo salleRepo, ServerStatusService serverStatusService) {
+    public AdminController( LigneAbsenceRepo ligneAbsenceRepo, EnstRepo enstRepo, SalleRepo salleRepo, ServerStatusService serverStatusService) {
         this.ligneAbsenceRepo = ligneAbsenceRepo;
         this.enstRepo = enstRepo;
         this.salleRepo = salleRepo;
@@ -103,7 +103,7 @@ public class AdminController {
         }
 boolean mobileServer = serverStatusService.checkMobileAppServerStatus("https://www.apirest.tech/emploi/all");
         System.out.println("Mobile "+mobileServer);
-        boolean mailServer = serverStatusService.checkMobileAppServerStatus("https://mail.apirest.tech/");
+        boolean mailServer = serverStatusService.checkMailServer();
         System.out.println("Mail "+mailServer);
         boolean webServer = serverStatusService.checkMobileAppServerStatus("https://www.apirest.tech/");
         System.out.println("Web "+webServer);
