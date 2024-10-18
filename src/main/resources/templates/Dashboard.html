@@ -113,16 +113,14 @@
                             <table class="table">
                                 <thead>
                                 <tr>
-                                    <th>Source</th>
                                     <th>User name</th>
                                     <th>Role</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    <td>Web</td>
-                                    <td>Bilel</td>
-                                    <td>Admin</td>
+                                <tr th:each="log:${loggedList}">
+                                    <td th:text="${log.logName}"></td>
+                                    <td th:text="${log.roles}"></td>
                                 </tr>
                                 </tbody>
                             </table>

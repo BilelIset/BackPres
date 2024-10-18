@@ -53,7 +53,7 @@ auth.userDetailsService(new UserDetailsService() {
 
         http
                 .authorizeRequests()
-                .antMatchers("/login", "/webjars/bootstrap/5.3.3/css/bootstrap.min.css",
+                .antMatchers("/login","/deconnect", "/webjars/bootstrap/5.3.3/css/bootstrap.min.css",
                         "/webjars/bootstrap-icons/1.10.5/font/bootstrap-icons.css",
                         "/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js", "/logo.png",
                         "/error")

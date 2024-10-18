@@ -2,10 +2,12 @@ package tn.isetsf.presence.webThymeleaf;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -17,18 +19,23 @@ import tn.isetsf.presence.Entity.LigneAbsence;
 import tn.isetsf.presence.Repository.EnstRepo;
 import tn.isetsf.presence.Repository.LigneAbsenceRepo;
 import tn.isetsf.presence.Repository.SalleRepo;
+import tn.isetsf.presence.sec.entity.Logged;
+import tn.isetsf.presence.sec.repository.LoggedRepo;
 import tn.isetsf.presence.serviceMail.EmailService;
 
 import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.List;
 
 @Controller
 @Transactional
 @RolesAllowed("ADMIN")
 public class AdminController {
+    @Autowired
+    LoggedRepo loggedRepo;
 
     private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
@@ -84,15 +91,8 @@ public class AdminController {
                                  @RequestParam(value = "page", defaultValue = "0") int page,
                                  @RequestParam(value = "size", defaultValue = "5") int size,
                                  @RequestParam(value = "keyword", defaultValue = "") String keyword) {
-
-        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-
-        if(authentication!=null){
-             Static.CURRENT_USER=((UserDetails) authentication.getPrincipal()).getUsername();
-            model.addAttribute("user",Static.CURRENT_USER);
-
-            System.out.println("Utilisateur connecté : "+Static.CURRENT_USER);
-        }
+List<Logged> loggedList=loggedRepo.findAll();
+model.addAttribute("loggedList",loggedList);
         int notifiedCount = 0;
         Page<LigneAbsence> absencePage = ligneAbsenceRepo.findByEnsi1Contains(keyword, PageRequest.of(page, size));
 
@@ -103,7 +103,7 @@ public class AdminController {
         }
 boolean mobileServer = serverStatusService.checkMobileAppServerStatus("https://www.apirest.tech/emploi/all");
         System.out.println("Mobile "+mobileServer);
-        boolean mailServer = serverStatusService.checkMailServer();
+        boolean mailServer=true;// = serverStatusService.checkMailServer();
         System.out.println("Mail "+mailServer);
         boolean webServer = serverStatusService.checkMobileAppServerStatus("https://www.apirest.tech/");
         System.out.println("Web "+webServer);

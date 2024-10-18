@@ -37,6 +37,7 @@ public class PresenceApplication {
 		return new RestTemplate();
 	}
 
+
 	public static void main(String[] args) {
 
 		SpringApplication.run(PresenceApplication.class, args);
