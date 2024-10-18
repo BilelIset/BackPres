@@ -1,5 +1,6 @@
 package tn.isetsf.presence.Controller;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import tn.isetsf.presence.Entity.Resp;
 import tn.isetsf.presence.Entity.Users;
 import tn.isetsf.presence.Repository.UserRepo;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -19,6 +21,8 @@ public class UserController {
 
     @Autowired
     private UserRepo userRepo;
+    @Autowired
+    HttpSession httpSession;
 
 
 
@@ -85,6 +89,7 @@ public class UserController {
 
     @PostMapping("/login")
     public Resp logApp(@RequestBody Users user) {
+
         Resp res = new Resp();
         res.setAdmin(false);
         res.setStatue(false);
@@ -98,6 +103,10 @@ public class UserController {
             if (us1.get().getIsAdmin()) {
                 System.out.println("Deuxième if");
                 res.setAdmin(true);
+                httpSession.setAttribute("login",us1);
+                httpSession.setMaxInactiveInterval(30);
+
+
             }
 
             res.setStatue(true);

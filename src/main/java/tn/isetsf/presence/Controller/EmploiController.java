@@ -106,6 +106,9 @@ System.out.println("salle = "+emploi.get(0).getNom_salle()+" seance =  "+emploi.
     public List<LigneAbsence> getLigneAbsnce(@RequestParam String salle, @RequestParam String seance, @RequestParam String ens){
         return ligneAbsenceRepo.trouverAbsence(LocalDate.now(),seance,salle,ens);
     }
+    public void session(){
+
+    }
     @PutMapping(value = ("/ens/update"),consumes = MediaType.APPLICATION_JSON_VALUE)
     public Boolean updateUser(@RequestParam Long mat, @RequestBody Ens ens){
         Optional<Ens> ens1 =enstRepo.findById(String.valueOf(mat));

@@ -23,7 +23,7 @@ public class SalleController {
     @PostMapping(value = "/salle/pointage", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Salle> getSalle() {
         List<Salle> salleList = new ArrayList<>();
-        List<Emploi> emplois = emploiRepo.trouverCren(String.valueOf(calculDate.getYear()), String.valueOf(calculDate.getSemestre()),String.valueOf(calculDate.indexJour()),String.valueOf(calculDate.getSeance()),String.valueOf(calculDate.getSeanceDouble()));
+        List<Emploi> emplois = emploiRepo.trouverCren(String.valueOf(calculDate.getYear()), String.valueOf(calculDate.getSemestre()),String.valueOf(calculDate.indexJour()),"1","7");
 System.out.println("ANNEE : "+calculDate.getYear()+" Semestre : " +   calculDate.getSemestre()+" jour : "+calculDate.indexJour()+" Seance simple : "+calculDate.getSeance()+" seance double : "+calculDate.getSeanceDouble());
         System.out.println("requete recue pour salle");
         System.out.println(emplois.toString());

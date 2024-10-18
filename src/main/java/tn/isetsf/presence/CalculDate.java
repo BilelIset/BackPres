@@ -85,6 +85,20 @@ public class CalculDate {
             return 0;
         }
     }
+    public String JourEnTouteLettre(){
+        String jrs="";
+        switch (indexJour()){
+            case 1 :jrs="Lundi" ;break;
+            case 2:jrs="Mardi";break;
+            case 3:jrs="Mercredi";break;
+            case 4:jrs="Jeudi";break;
+            case 5:jrs="Vendredi";break;
+            case 6:jrs="Samedi";break;
+            case 7:jrs="Dimache";break;
+            default:break;
+        }
+        return jrs;
+    }
         public String getDate(){
             LocalDateTime date = LocalDateTime.now();
 

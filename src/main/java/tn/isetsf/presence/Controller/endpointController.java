@@ -34,10 +34,7 @@ public class endpointController {
     public void end6(){
 
     }
-    @PostMapping(path = "")
-    public void end7(){
 
-    }
     @PostMapping(path = "/pointages")
     public void end8(){
 
