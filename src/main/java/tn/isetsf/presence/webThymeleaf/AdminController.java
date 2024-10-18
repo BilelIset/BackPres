@@ -66,7 +66,7 @@ public class AdminController {
         model.addAttribute("user",Static.CURRENT_USER);
 
 
-        return "/AbsenceEnseignant"; // Ensure this returns the correct view name
+        return "AbsenceEnseignant"; // Ensure this returns the correct view name
     }
     @RolesAllowed("ADMIN")
 
@@ -75,7 +75,7 @@ public class AdminController {
         model.addAttribute("pathCourant", "/AbsenceEtudiant");
         model.addAttribute("user",Static.CURRENT_USER);
 
-        return "/AbsenceEtudiant"; // Ensure this returns the correct view name
+        return "AbsenceEtudiant"; // Ensure this returns the correct view name
     }
     @RolesAllowed("ADMIN")
 
@@ -139,7 +139,7 @@ boolean mobileServer = serverStatusService.checkMobileAppServerStatus("https://b
         List<Object[]> objectList = ligneAbsenceRepo.countAbsencesByEnseignantNative();
         model.addAttribute("absenceByEnseignant", objectList);
 
-        return "/Dashboard"; // Ensure this returns the correct view name
+        return "Dashboard"; // Ensure this returns the correct view name
     }
 }
 

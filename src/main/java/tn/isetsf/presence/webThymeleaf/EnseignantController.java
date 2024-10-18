@@ -24,7 +24,7 @@ public class EnseignantController {
         }
         model.addAttribute("message","Hello Teacher");
         model.addAttribute("user",Static.CURRENT_USER);
-        return "/EspaceEnseignant";
+        return "EspaceEnseignant";
 
     }
 }
