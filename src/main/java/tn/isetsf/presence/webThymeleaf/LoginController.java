@@ -9,16 +9,16 @@ import javax.transaction.Transactional;
 
 @Controller
 @Transactional
-public class loginController {
-
+public class LoginController {
 
     @GetMapping(path = "/login")
     public String logUser(Model model){
-
-        return "/login";
+        return "login"; // Retirer le slash ici
     }
+
     @GetMapping(path = "/logout")
     public String logOutUser(){
-        return"/logout";
+        return "logout"; // Retirer le slash ici
     }
 }
+
