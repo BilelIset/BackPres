@@ -103,7 +103,7 @@ public class AdminController {
         }
 boolean mobileServer = serverStatusService.checkMobileAppServerStatus("https://www.apirest.tech/emploi/all");
         System.out.println("Mobile "+mobileServer);
-        boolean mailServer = serverStatusService.checkMailServer("https://mail.apirest.tech/actuator/");
+        boolean mailServer = serverStatusService.checkMailServer("https://mail.apirest.tech/");
         System.out.println("Mail "+mailServer);
         boolean webServer = serverStatusService.checkMobileAppServerStatus("https://www.apirest.tech/");
         System.out.println("Web "+webServer);
