@@ -101,11 +101,11 @@ public class AdminController {
                 notifiedCount++;
             }
         }
-boolean mobileServer = serverStatusService.checkMobileAppServerStatus("https://back.apirest.tech/emploi/all");
+boolean mobileServer = serverStatusService.checkMobileAppServerStatus("https://www.apirest.tech/emploi/all");
         System.out.println("Mobile "+mobileServer);
-        boolean mailServer = serverStatusService.checkMailServer("https://back.apirest.tech/actuator/health/mail");
+        boolean mailServer = serverStatusService.checkMailServer("https://mail.apirest.tech/actuator/");
         System.out.println("Mail "+mailServer);
-        boolean webServer = serverStatusService.checkMobileAppServerStatus("https://back.apirest.tech/");
+        boolean webServer = serverStatusService.checkMobileAppServerStatus("https://www.apirest.tech/");
         System.out.println("Web "+webServer);
         boolean statusGeneral = mailServer && mobileServer && webServer;
         System.out.println("Générale  "+statusGeneral);
