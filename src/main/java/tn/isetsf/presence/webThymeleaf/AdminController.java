@@ -91,7 +91,8 @@ public class AdminController {
                                  @RequestParam(value = "page", defaultValue = "0") int page,
                                  @RequestParam(value = "size", defaultValue = "5") int size,
                                  @RequestParam(value = "keyword", defaultValue = "") String keyword) {
-List<Logged> loggedList=loggedRepo.findAll();
+List<Logged> loggedList=loggedRepo.findByConnectedTrue();
+System.out.println(loggedList);
 model.addAttribute("loggedList",loggedList);
         int notifiedCount = 0;
         Page<LigneAbsence> absencePage = ligneAbsenceRepo.findByEnsi1Contains(keyword, PageRequest.of(page, size));

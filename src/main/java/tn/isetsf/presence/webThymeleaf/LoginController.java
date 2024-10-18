@@ -14,8 +14,11 @@ import tn.isetsf.presence.sec.repository.LoggedRepo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Controller
 @Transactional
@@ -29,17 +32,25 @@ public class LoginController {
     }
 
     @GetMapping(path = "/deconnect")
-    public String logOutUser(HttpServletRequest request, HttpServletResponse response) {
+    public String logOutUser(HttpServletRequest request, HttpServletResponse response, HttpSession httpSession) {
+        String sessionId=httpSession.getId();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null) {
+        if (authentication != null&&sessionId!=null) {
             System.out.println("Authentification reçue ....");
             String CURRENT_USER = ((UserDetails) authentication.getPrincipal()).getUsername();
             System.out.println("Utilisateur reçu .... " + CURRENT_USER);
-            Logged logged=loggedRepo.getByLogName(CURRENT_USER);
+            //Logged logged=loggedRepo.getByLogName(CURRENT_USER);
+            Logged logged=loggedRepo.findByLogNameAndSessionId(CURRENT_USER,sessionId);
+            if(logged!=null){
+                logged.setConnected(false);
+                logged.setDateDeconnect(LocalDateTime.now());
+                loggedRepo.save(logged);
+            }
+
 
             // Vous pouvez ajouter une logique ici pour enregistrer la déconnexion
             System.out.println(logged);
-            loggedRepo.deleteById(logged.getId());
+           // loggedRepo.deleteById(logged.getId());
             System.out.println("Suppression effectuer avec success .... ");
             // Invalider la session
             request.getSession().invalidate();

@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @AllArgsConstructor@NoArgsConstructor
@@ -20,7 +21,8 @@ public class Logged {
     private String logName;
     private String roles;
     private boolean connected;
-    private LocalDate dateConnect;
-    private LocalDate dateDeconnect;
+    private LocalDateTime dateConnect;
+    private LocalDateTime dateDeconnect;
+    private String sessionId;
 
 }
