@@ -15,15 +15,17 @@ public class EnseignantController {
     @GetMapping(path = "/EspaceEnseignant")
     public String EnseignantZone(Model model){
         Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        String utilisateur="";
+
 
         if(authentication!=null){
-            Static.CURRENT_USER=((UserDetails) authentication.getPrincipal()).getUsername();
-            model.addAttribute("user",Static.CURRENT_USER);
+             utilisateur=((UserDetails) authentication.getPrincipal()).getUsername();
+            model.addAttribute("user",utilisateur);
 
-            System.out.println("Utilisateur connecté : "+Static.CURRENT_USER);
+            System.out.println("Utilisateur connecté : "+utilisateur);
         }
         model.addAttribute("message","Hello Teacher");
-        model.addAttribute("user",Static.CURRENT_USER);
+        model.addAttribute("user",utilisateur);
         return "EspaceEnseignant";
 
     }

@@ -115,12 +115,16 @@
                                 <tr>
                                     <th>User name</th>
                                     <th>Role</th>
+                                    <th>Deconnecter l'utilisateur ?</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <tr th:each="log:${loggedList}">
                                     <td th:text="${log.logName}"></td>
                                     <td th:text="${log.roles}"></td>
+                                    <td>
+
+
                                 </tr>
                                 </tbody>
                             </table>

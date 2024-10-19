@@ -3,6 +3,7 @@ package tn.isetsf.presence.webThymeleaf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -24,7 +25,10 @@ import tn.isetsf.presence.sec.repository.LoggedRepo;
 import tn.isetsf.presence.serviceMail.EmailService;
 
 import javax.annotation.security.RolesAllowed;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
+import java.net.http.HttpRequest;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
@@ -36,6 +40,8 @@ import java.util.List;
 public class AdminController {
     @Autowired
     LoggedRepo loggedRepo;
+
+
 
     private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
@@ -56,6 +62,12 @@ public class AdminController {
 
 
     @RolesAllowed("ADMIN")
+//    @GetMapping(path = "/forcerDeconnect")
+//    public String forcedDeconnect(Model model,){
+//        System.out.println("Session recu : "+session + "Login recu : "+id);
+//        return " redirect:/login";
+//
+//    }
 
     @GetMapping(path = "/AbsenceEnseignant")
     public String indexModel(Model model,
@@ -70,7 +82,18 @@ public class AdminController {
         model.addAttribute("currentPage", page);
         model.addAttribute("keyword", keyword);
         model.addAttribute("pathCourant", "/AbsenceEnseignant");
-        model.addAttribute("user",Static.CURRENT_USER);
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        String utilisateur="";
+
+
+        if(authentication!=null){
+            utilisateur=((UserDetails) authentication.getPrincipal()).getUsername();
+            model.addAttribute("user",utilisateur);
+
+            System.out.println("Utilisateur connecté : "+utilisateur);
+        }
+
+        model.addAttribute("user",utilisateur);
 
 
         return "AbsenceEnseignant"; // Ensure this returns the correct view name
@@ -80,7 +103,18 @@ public class AdminController {
     @GetMapping(path = "/AbsenceEtudiant")
     public String etudiantPage(Model model) {
         model.addAttribute("pathCourant", "/AbsenceEtudiant");
-        model.addAttribute("user",Static.CURRENT_USER);
+        //String utilisateurCourant = "";
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        String utilisateur="";
+
+
+        if(authentication!=null){
+            utilisateur=((UserDetails) authentication.getPrincipal()).getUsername();
+            model.addAttribute("user",utilisateur);
+
+            System.out.println("Utilisateur connecté : "+utilisateur);
+        }
+        model.addAttribute("user",utilisateur);
 
         return "AbsenceEtudiant"; // Ensure this returns the correct view name
     }
@@ -91,6 +125,18 @@ public class AdminController {
                                  @RequestParam(value = "page", defaultValue = "0") int page,
                                  @RequestParam(value = "size", defaultValue = "5") int size,
                                  @RequestParam(value = "keyword", defaultValue = "") String keyword) {
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        String utilisateur="";
+
+
+        if(authentication!=null){
+            utilisateur=((UserDetails) authentication.getPrincipal()).getUsername();
+            model.addAttribute("user",utilisateur);
+
+            System.out.println("Utilisateur connecté : "+utilisateur);
+        }
+
+        model.addAttribute("user",utilisateur);
 List<Logged> loggedList=loggedRepo.findByConnectedTrue();
 System.out.println(loggedList);
 model.addAttribute("loggedList",loggedList);
@@ -102,6 +148,7 @@ model.addAttribute("loggedList",loggedList);
                 notifiedCount++;
             }
         }
+
 boolean mobileServer = serverStatusService.checkMobileAppServerStatus("https://www.apirest.tech/emploi/all");
         System.out.println("Mobile "+mobileServer);
         boolean mailServer=true;// = serverStatusService.checkMailServer();
@@ -136,6 +183,7 @@ boolean mobileServer = serverStatusService.checkMobileAppServerStatus("https://w
         model.addAttribute("keyword", keyword);
         model.addAttribute("pathCourant", "/Dashboard");
         model.addAttribute("nbNotifier", notifiedCount);
+
 
         List<Object[]> objectList = ligneAbsenceRepo.countAbsencesByEnseignantNative();
         model.addAttribute("absenceByEnseignant", objectList);
