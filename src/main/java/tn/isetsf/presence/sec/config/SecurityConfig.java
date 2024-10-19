@@ -63,7 +63,7 @@ auth.userDetailsService(new UserDetailsService() {
                 .anyRequest()
                 .authenticated()
                 .and()
-                .sessionManagement().maximumSessions(1).maxSessionsPreventsLogin(true).expiredUrl("/login?expired=true");
+                .sessionManagement().maximumSessions(1);
 
         // Accessible à tout le monde
     }
