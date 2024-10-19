@@ -61,7 +61,9 @@ auth.userDetailsService(new UserDetailsService() {
                 .antMatchers("/AbsenceEnseignant", "/AbsenceEtudiant", "/Dashboard","/actuator/**")
                 .hasRole("ADMIN").antMatchers("/EspaceEnseignant").hasRole("ENSEIGNANT") // Remplacez "YOUR_ROLE" par le rôle approprié
                 .anyRequest()
-                .authenticated();
+                .authenticated()
+                .and()
+                .sessionManagement().maximumSessions(1).maxSessionsPreventsLogin(true).expiredUrl("/login?expired=true");
 
         // Accessible à tout le monde
     }
