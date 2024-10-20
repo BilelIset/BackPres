@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.server.session.InMemoryWebSessionStore;
 import tn.isetsf.presence.sec.config.SecurityConfig;
 import tn.isetsf.presence.sec.entity.Logged;
 import tn.isetsf.presence.sec.repository.LoggedRepo;
@@ -18,6 +19,7 @@ import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Controller
@@ -28,6 +30,7 @@ public class LoginController {
 
     @GetMapping(path = "/login")
     public String logUser(Model model){
+
         return "login"; // Retirer le slash ici
     }
 
@@ -40,18 +43,16 @@ public class LoginController {
             String CURRENT_USER = ((UserDetails) authentication.getPrincipal()).getUsername();
             System.out.println("Utilisateur reçu .... " + CURRENT_USER);
             //Logged logged=loggedRepo.getByLogName(CURRENT_USER);
-            Logged logged=loggedRepo.findByLogNameAndSessionId(CURRENT_USER,sessionId);
-            if(logged!=null){
-                logged.setConnected(false);
-                logged.setDateDeconnect(LocalDateTime.now());
-                loggedRepo.save(logged);
-            }
+           List< Logged> logged=  loggedRepo.findByLogNameAndSessionId(CURRENT_USER,sessionId);
+           System.out.println("Utilisateur trouvé : "+logged);
+           for(Logged log:logged){
+               if (log.getSessionId()!=sessionId)
+               log.setConnected(false);
+               log.setDateDeconnect(LocalDateTime.now());
+               System.out.println("Set false et dateTime effectué");
+               loggedRepo.save(log);
+           }
 
-
-            // Vous pouvez ajouter une logique ici pour enregistrer la déconnexion
-            System.out.println(logged);
-           // loggedRepo.deleteById(logged.getId());
-            System.out.println("Suppression effectuer avec success .... ");
             // Invalider la session
             request.getSession().invalidate();
             SecurityContextHolder.clearContext();

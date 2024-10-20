@@ -7,14 +7,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.session.InMemoryWebSessionStore;
 import tn.isetsf.presence.CalculDate;
 import tn.isetsf.presence.Entity.LigneAbsence;
 import tn.isetsf.presence.Repository.EnstRepo;
@@ -27,11 +28,15 @@ import tn.isetsf.presence.serviceMail.EmailService;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionEvent;
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.net.http.HttpRequest;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 @Controller
@@ -42,6 +47,8 @@ public class AdminController {
     LoggedRepo loggedRepo;
 
 
+    @Autowired
+    private AbsenceGraphService graphService;
 
     private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
@@ -124,10 +131,11 @@ public class AdminController {
     public String dashboardModel(Model model,
                                  @RequestParam(value = "page", defaultValue = "0") int page,
                                  @RequestParam(value = "size", defaultValue = "5") int size,
-                                 @RequestParam(value = "keyword", defaultValue = "") String keyword) {
+                                 @RequestParam(value = "keyword", defaultValue = "") String keyword) throws IOException {
         Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
         String utilisateur="";
-
+graphService.generateMostAbsentTeachersGraph();
+        model.addAttribute("imagePath", "images/mostAbsentTeachersGraph.png");
 
         if(authentication!=null){
             utilisateur=((UserDetails) authentication.getPrincipal()).getUsername();
@@ -138,6 +146,8 @@ public class AdminController {
 
         model.addAttribute("user",utilisateur);
 List<Logged> loggedList=loggedRepo.findByConnectedTrue();
+System.out.println("Utilisateur trouvé a la connection"+loggedList);
+
 System.out.println(loggedList);
 model.addAttribute("loggedList",loggedList);
         int notifiedCount = 0;
@@ -172,7 +182,12 @@ boolean mobileServer = serverStatusService.checkMobileAppServerStatus("https://w
         String dateNow = formatter.format(date);
         String fullDate = calculDate.JourEnTouteLettre() + "  " + dateNow;
 
-        List<LigneAbsence> listNonNotifier = ligneAbsenceRepo.findByNotifiedFalse();
+        List<LigneAbsence> listNonNotified = ligneAbsenceRepo.findByNotifiedFalse();
+        List<LigneAbsence> listNonNotifier=new ArrayList<>();
+        for (int i=0;i<5;i++)
+        {
+            listNonNotifier.add(listNonNotified.get(i));
+        }
         model.addAttribute("listNonNotifier", listNonNotifier);
         model.addAttribute("dateNow", fullDate);
         model.addAttribute("nbEns", nbEns);
@@ -190,5 +205,19 @@ boolean mobileServer = serverStatusService.checkMobileAppServerStatus("https://w
 
         return "Dashboard"; // Ensure this returns the correct view name
     }
-}
+    @GetMapping("/api/absences")
+    @ResponseBody
+    public List<Object[]> getAbsencesByEnseignant() {
+        List<Object[]> objectList = ligneAbsenceRepo.countAbsencesByEnseignantNative();
+        List<Object[]> objects=new ArrayList<>();
+        for (int i=0;i<5;i++){
+            objects.add(objectList.get(i));
+        }
+
+
+
+
+    return objects;
+
+}}
 

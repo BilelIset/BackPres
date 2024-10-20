@@ -3,61 +3,67 @@ package tn.isetsf.presence.sec.webSecurity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.server.WebSession;
+import org.springframework.web.server.session.InMemoryWebSessionStore;
+import tn.isetsf.presence.PresenceApplication;
 import tn.isetsf.presence.sec.entity.Logged;
 import tn.isetsf.presence.sec.repository.LoggedRepo;
 
 import javax.servlet.http.HttpSession;
+import javax.swing.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-
 @Controller
 @RequestMapping("/default")
 public class DefaultController {
+
     @Autowired
-LoggedRepo loggedRepo;
+    LoggedRepo loggedRepo;
 
     @GetMapping
     public String defaultAfterLogin(Authentication authentication, HttpSession httpSession) {
-String session=httpSession.getId();
+        List<Logged> loggedUsers = loggedRepo.findByConnectedTrue();
+        String currentUser;
 
-System.out.println(session);
+        if (!loggedUsers.isEmpty()) {
+            authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null) {
+                currentUser = ((UserDetails) authentication.getPrincipal()).getUsername();
+                loggedUsers.forEach(loggedUser -> {
+                    if (loggedUser.getLogName().equals(currentUser)) {
+                        loggedUser.setConnected(false);
+                        loggedUser.setDateDeconnect(LocalDateTime.now());
+                    }
+                    loggedRepo.save(loggedUser);
+                });
+            } else {
+                currentUser = null;
+            }
+        } else {
+            currentUser = null;
+        }
 
+        String sessionId = httpSession.getId();
+        if (currentUser != null && sessionId != null) {
+            Logged loggedRecord = new Logged(null, currentUser, authentication.getAuthorities().toString(), true, LocalDateTime.now(), null, sessionId);
+            if (loggedRepo.findByLogNameAndSessionId(currentUser, sessionId).isEmpty()) {
+                loggedRepo.save(loggedRecord);
+            } else {
+                loggedRepo.save(loggedRecord);
+            }
 
-        if(authentication!=null&&session!=null){
-            System.out.println("Authentification recu ....");
-           String CURRENT_USER=((UserDetails) authentication.getPrincipal()).getUsername();
-            System.out.println("Utilisateur recu ...."+CURRENT_USER);
-            String CURRENT_ROLE= ((UserDetails) authentication.getPrincipal()).getAuthorities().toString();
-            System.out.println("Roles recu ...."+CURRENT_ROLE);
-            Logged ifLogged=loggedRepo.findByLogNameAndSessionId(CURRENT_USER,session);
-            if(ifLogged!=null){
-            if(!Objects.equals(ifLogged.getSessionId(), session)){
-                if(ifLogged.isConnected()){
-                   ifLogged.setConnected(false);
-                   ifLogged.setDateDeconnect(LocalDateTime.now());
-                   loggedRepo.save(ifLogged);
-                }
-
-            }}else {
-                Logged logged = new Logged(null, CURRENT_USER, CURRENT_ROLE, true, LocalDateTime.now(), null, session);
-                System.out.println("Logged recu ...." + logged);
-                loggedRepo.save(logged);
-                System.out.println("Succeed saving  ...." + CURRENT_USER);
-
-            }}
-
-
-        if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
-            System.out.println("Entree et redirection vers dashboard ....");
-            return "redirect:/Dashboard";
-        } else if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ENSEIGNANT"))) {
-            System.out.println("Entree et redirection vers Enseignant ....");
-
-            return "redirect:/EspaceEnseignant";
+            if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+                return "redirect:/Dashboard";
+            } else if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ENSEIGNANT"))) {
+                return "redirect:/EspaceEnseignant";
+            }
         }
         return "redirect:/";
     }

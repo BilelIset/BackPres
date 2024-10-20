@@ -1,201 +1,202 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="template">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="template">
 
 <head>
     <meta charset="UTF-8">
     <title>Dashboard</title>
     <link rel="stylesheet" href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css">
     <script src="/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+
+        <script src="/chart.js"></script>
+
+
     <link rel="stylesheet" href="/webjars/bootstrap-icons/1.10.5/font/bootstrap-icons.css">
+    <script>
+        // Fonction pour récupérer les données
+
+        // Fonction pour récupérer les absences
+        async function fetchAbsences() {
+            const response = await fetch('/api/absences'); // Remplacez par votre URL d'API
+            const data = await response.json();
+            return data; // Attendez que les données soient renvoyées
+        }
+
+        // Fonction pour dessiner le graphique
+        async function drawChart() {
+            const absencesData = await fetchAbsences();
+
+            const labels = []; // Pour stocker les noms des enseignants
+            const counts = []; // Pour stocker le nombre d'absences
+
+            // Extraire les noms des enseignants et le nombre d'absences
+            absencesData.forEach(absence => {
+                const nomEnseignant = absence[0]; // Nom de l'enseignant
+                const nombreAbsences = absence[1]; // Nombre d'absences
+                labels.push(nomEnseignant);
+                counts.push(nombreAbsences);
+            });
+
+            const ctx = document.getElementById('absenceChart').getContext('2d');
+            const absenceChart = new Chart(ctx, {
+                type: 'bar', // Type de graphique
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Nombre d\'absences',
+                        data: counts,
+                        backgroundColor: 'rgba(79, 129, 189, 0.6)', // Couleur des barres
+                        borderColor: 'rgba(79, 129, 189, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true // Démarrer à zéro
+                        }
+                    },
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Appel de la fonction pour dessiner le graphique
+        drawChart();
+    </script>
+
 
 </head>
+
 <body>
-<div layout:fragment="content1" style="margin-top:10px">
-    <div class="card bg-primary">
+<div layout:fragment="content1" class="container my-4">
+    <div class="card bg-primary ">
         <div class="card-header bg-primary">
             <h2 style="color:white" th:text="'Tableau de bord : ' +${dateNow}"></h2>
         </div>
     </div>
 
-<div class="container"> <table>
-    <tr>
+    <div class="container mt-2"> <table>
+        <tr>
 
-           <td> <h6 style="width:250px;color:white" th:class="${webServer}?' d-none':'blink text-danger'"
-                th:text="${webServer}? 'Web : Actif':'Serveur Web  : Non Actif !'"></h6>
+            <td> <h6 style="width:250px;color:white" th:class="${webServer}?' d-none':'blink text-danger'"
+                     th:text="${webServer}? 'Web : Actif':'Serveur Web  : Non Actif !'"></h6>
 
-           </td><td>
+            </td><td>
             <h6 style="width:250px;color:white" th:class="${mailServer}?' d-none':'blink text-danger'"
                 th:text="${mailServer}? 'Messagerie : Actif':'Serveur Messagerie  : Non Actif !'"></h6></td><td>
             <h6 style="width:250px;color:white" th:class="${mobileServer}?' d-none':'blink text-danger'"
                 th:text="${mobileServer}? 'Mobile : Actif':' Serveur Mobile : Non Actif ! !'"></h6></td>
 
-    </tr> </table></div>
-    <div class="container-fluid">
-        <table class="table table-bordered table-responsive" style="font-size:10px">
-            <tr>
-                <td style="width:60%; height:40%">
-                    <div class="card">
-                        <div class="card-header bg-info">
-                            <h6>Aperçu des 5 derniers absences enseignants</h6>
+        </tr> </table></div>
+    <div class="row">
+        <!-- Dernier Absence Card -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-info">
+                    <h6 class="text-light">Dernier absence</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-column">
+                        <div class="card mb-2" th:each="abs, status : ${listAbsence}">
+                            <div class="card-header bg-info text-light d-flex justify-content-between">
+                                <span th:text="${status.index + 1}"></span>
+                                <span th:text="${abs.ensi1}"></span>
+                                <span th:text="${abs.nom_salle}"></span>
+                            </div>
+
                         </div>
-                        <div class="card-body">
-                            <table class="table table-striped">
-                                <thead>
-                                <tr>
-                                    <th>Nom de salle</th>
-                                    <th>Nom Matière</th>
-                                    <th>Enseignant</th>
-                                    <th>Nom De Séance</th>
-                                    <th>Horaire</th>
-                                    <th>Année</th>
-                                    <th>Jour</th>
-                                    <th>Date</th>
-                                    <th>Notifié</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr th:each="abs : ${listAbsence}">
-                                    <td th:text="${abs.nom_salle}"></td>
-                                    <td th:text="${abs.nom_matiere}"></td>
-                                    <td th:text="${abs.ensi1}"></td>
-                                    <td th:text="${abs.nom_seance}"></td>
-                                    <td th:text="${abs.seanceDouble}"></td>
-                                    <td th:text="${abs.annee1}"></td>
-                                    <td th:text="${abs.nom_jour}"></td>
-                                    <td th:text="${abs.date}"></td>
-                                    <td th:text="${abs.notified ? 'Oui' : 'Non'}"
-                                        th:attr="style=(${abs.notified} ? 'color:green;' : 'color:red;')"></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                        <a th:href="@{/AbsenceEnseignant}">Voir Detail</a>
                     </div>
-                </td>
+                </div>
+            </div>
+        </div>
 
-                <td style="width:60%; height:40%">
-                    <div class="card">
-                        <div class="card-header bg-warning">
-                            <h6>Enseignants non notifiés</h6>
+        <!-- Absence Non Notifié Card -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <h6>Dernier absence non notifié</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-column">
+                        <div class="card mb-2" th:each="abs, status : ${listNonNotifier}">
+                            <div class="card-header bg-warning text-light d-flex justify-content-between">
+                                <span th:text="${status.index + 1}"></span>
+                                <span th:text="${abs.ensi1}"></span>
+                                <span th:text="${abs.nom_salle}"></span>
+                                <span th:text="${abs.nom_seance}"></span>
+                            </div>
+
                         </div>
-                        <div class="card-body">
-                            <table class="table table-striped">
-                                <thead>
-                                <tr>
-                                    <th>Nom Matière</th>
-                                    <th>Enseignant</th>
-                                    <th>Horaire</th>
-                                    <th>Date</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr th:each="abs : ${listAbsence}">
-                                    <td th:text="${abs.nom_matiere}"></td>
-                                    <td th:text="${abs.ensi1}"></td>
-                                    <td th:text="${abs.nom_seance}"></td>
-                                    <td th:text="${abs.date}"></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                        <a th:href="@{#}">Voir Detail</a>
+
                     </div>
-                </td>
-            </tr>
+                </div>
+            </div>
+        </div>
 
-            <tr>
-                <td class="table" style="width:50%; height:40%">
-                    <div class="card">
-                        <div class="card-header bg-secondary">
-                            <h6 class="text-light bg-secondary">Utilisateurs connectés</h6>
+        <!-- Utilisateur Connecté Card -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6> Top 5 absences</h6>
+                </div>
+                <div class="card-body">
+                    <h2>Top 5 Absence Enseignants</h2>
+                    <canvas id="absenceChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top 5 Absences Card -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6>Statistique</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-column">
+                        <div class="card mb-2" th:each="abs, status : ${absenceByEnseignant}" th:if="${status.index < 5}">
+                            <div class="card-header bg-secondary text-light d-flex justify-content-between">
+                                <span th:text="${status.index + 1}"></span>
+                                <span th:text="${abs[0]}"></span>
+                                <span th:text="${abs[1]}"></span>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <table class="table">
-                                <thead>
-                                <tr>
-                                    <th>User name</th>
-                                    <th>Role</th>
-                                    <th>Deconnecter l'utilisateur ?</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr th:each="log:${loggedList}">
-                                    <td th:text="${log.logName}"></td>
-                                    <td th:text="${log.roles}"></td>
-                                    <td>
+                        <a th:href="@{#}">Voir Detail</a>
 
-
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
                     </div>
-                </td>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-success">
+                    <h6>Utilisateur connecté</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-column">
+                        <div class="card mb-2" th:each="log, status : ${loggedList}">
+                            <div class="card-header bg-success text-light d-flex justify-content-between">
+                                <span th:text="${status.index + 1}"></span>
+                                <span th:text="${log.logName}"></span>
+                                <span th:text="${log.roles}"></span>
+                            </div>
+                        </div>
+                        <a th:href="@{#}">Voir Detail</a>
 
-                <td class="table" style="width:50%; height:40%">
-                    <table class="table table-bordered table-responsive" style="font-size:10px">
-                        <tr>
-                            <td>
-                                <table class="table">
-                                    <tr>
-                                        <td>
-                                            <div class="card">
-                                                <div class="card-header bg-secondary">
-                                                    <h6 class="text-light">Absence Top 5</h6>
-                                                </div>
-                                                <div class="card-body">
-                                                    <table class="table table-striped table-bordered">
-                                                        <thead>
-                                                        <tr class="text-secondary">
-                                                            <th>Matricule</th>
-                                                            <th>Absence</th>
-                                                        </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                        <tr th:each="abs, status : ${absenceByEnseignant}" th:if="${status.index < 5}">
-                                                            <td th:text="${abs[0]}"></td>
-                                                            <td th:text="${abs[1]}"></td>
-                                                        </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="card">
-                                                <div class="card-header bg-secondary">
-                                                    <h6 class="text-light">Statistique</h6>
-                                                </div>
-                                                <div class="card-body">
-                                                    <table class="table table-striped table-bordered">
-                                                        <tr>
-                                                            <td>Département</td>
-                                                            <td>5</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Salles</td>
-                                                            <td th:text="${nbSalles}"></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Enseignants</td>
-                                                            <td th:text="${nbEns}"></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Etudiants</td>
-                                                            <td>2000</td>
-                                                        </tr>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 </div>
 </body>

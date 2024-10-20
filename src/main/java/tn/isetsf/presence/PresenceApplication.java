@@ -6,16 +6,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.core.session.SessionIdChangedEvent;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.session.InMemoryWebSessionStore;
 import tn.isetsf.presence.sec.repository.AppRoleRepo;
 import tn.isetsf.presence.sec.repository.AppUserRepo;
 import tn.isetsf.presence.sec.service.AppUserInterfaceImpl;
 
 
+import javax.servlet.http.HttpSession;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @SpringBootApplication
@@ -41,7 +47,11 @@ public class PresenceApplication {
 	public static void main(String[] args) {
 
 		SpringApplication.run(PresenceApplication.class, args);
-	}}
+	}
+
+
+
+}
 
 //		int index = 0, indexdouble = 0;
 //
