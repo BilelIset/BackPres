@@ -19,51 +19,50 @@ import javax.swing.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-@Controller
+import java.util.Objects;@Controller
 @RequestMapping("/default")
 public class DefaultController {
 
     @Autowired
-    LoggedRepo loggedRepo;
+    private LoggedRepo loggedRepo;
 
     @GetMapping
     public String defaultAfterLogin(Authentication authentication, HttpSession httpSession) {
-        List<Logged> loggedUsers = loggedRepo.findByConnectedTrue();
-        String currentUser;
-
-        if (!loggedUsers.isEmpty()) {
-            authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication != null) {
-                currentUser = ((UserDetails) authentication.getPrincipal()).getUsername();
-                loggedUsers.forEach(loggedUser -> {
-                    if (loggedUser.getLogName().equals(currentUser)) {
-                        loggedUser.setConnected(false);
-                        loggedUser.setDateDeconnect(LocalDateTime.now());
-                    }
-                    loggedRepo.save(loggedUser);
-                });
-            } else {
-                currentUser = null;
-            }
-        } else {
-            currentUser = null;
-        }
+        String currentUser = getCurrentUser(authentication);
+        updateLoggedUsersStatus(currentUser);
 
         String sessionId = httpSession.getId();
         if (currentUser != null && sessionId != null) {
             Logged loggedRecord = new Logged(null, currentUser, authentication.getAuthorities().toString(), true, LocalDateTime.now(), null, sessionId);
             if (loggedRepo.findByLogNameAndSessionId(currentUser, sessionId).isEmpty()) {
                 loggedRepo.save(loggedRecord);
-            } else {
-                loggedRepo.save(loggedRecord);
             }
+            return redirectToRolePage(authentication);
+        }
+        return "redirect:/";
+    }
 
-            if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
-                return "redirect:/Dashboard";
-            } else if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ENSEIGNANT"))) {
-                return "redirect:/EspaceEnseignant";
-            }
+    private String getCurrentUser(Authentication authentication) {
+        return (authentication != null) ? ((UserDetails) authentication.getPrincipal()).getUsername() : null;
+    }
+
+    private void updateLoggedUsersStatus(String currentUser) {
+        if (!loggedRepo.findByConnectedTrue().isEmpty()) {
+            loggedRepo.findByConnectedTrue().forEach(loggedUser -> {
+                if (loggedUser.getLogName().equals(currentUser)) {
+                    loggedUser.setConnected(false);
+                    loggedUser.setDateDeconnect(LocalDateTime.now());
+                }
+                loggedRepo.save(loggedUser);
+            });
+        }
+    }
+
+    private String redirectToRolePage(Authentication authentication) {
+        if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+            return "redirect:/Dashboard";
+        } else if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ENSEIGNANT"))) {
+            return "redirect:/EspaceEnseignant";
         }
         return "redirect:/";
     }

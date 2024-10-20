@@ -88,22 +88,21 @@ public class AdminController {
         model.addAttribute("currentPage", page);
         model.addAttribute("keyword", keyword);
         model.addAttribute("pathCourant", "/AbsenceEnseignant");
-        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-        String utilisateur="";
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String utilisateur = "";
 
-        if(authentication!=null){
-            utilisateur=((UserDetails) authentication.getPrincipal()).getUsername();
-            model.addAttribute("user",utilisateur);
-
-            System.out.println("Utilisateur connecté : "+utilisateur);
+        if (authentication != null) {
+            utilisateur = ((UserDetails) authentication.getPrincipal()).getUsername();
+            model.addAttribute("user", utilisateur);
+            logger.info("Utilisateur connecté : {}", utilisateur);
         }
 
-        model.addAttribute("user",utilisateur);
-
+        model.addAttribute("user", utilisateur);
 
         return "AbsenceEnseignant"; // Ensure this returns the correct view name
     }
+
     @RolesAllowed("ADMIN")
 
     @GetMapping(path = "/AbsenceEtudiant")
@@ -145,7 +144,7 @@ public class AdminController {
         model.addAttribute("user",utilisateur);
 List<Logged> loggedList=loggedRepo.findByConnectedTrue();
 System.out.println("Utilisateur trouvé a la connection"+loggedList);
-
+System.out.println("Utilisateur trouvé apres l'erreur"+loggedList);
 System.out.println(loggedList);
 model.addAttribute("loggedList",loggedList);
         int notifiedCount = 0;
