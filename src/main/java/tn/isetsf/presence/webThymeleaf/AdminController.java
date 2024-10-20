@@ -47,8 +47,7 @@ public class AdminController {
     LoggedRepo loggedRepo;
 
 
-    @Autowired
-    private AbsenceGraphService graphService;
+
 
     private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
@@ -134,8 +133,7 @@ public class AdminController {
                                  @RequestParam(value = "keyword", defaultValue = "") String keyword) throws IOException {
         Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
         String utilisateur="";
-graphService.generateMostAbsentTeachersGraph();
-        model.addAttribute("imagePath", "images/mostAbsentTeachersGraph.png");
+
 
         if(authentication!=null){
             utilisateur=((UserDetails) authentication.getPrincipal()).getUsername();
