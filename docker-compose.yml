@@ -5,7 +5,7 @@ services:
     ports:
       - "8085:8085"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres0:5432/faculte  # Utiliser le nom du conteneur postgres0
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://51.77.210.237:5432/faculte  # Utiliser le nom du conteneur postgres0
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=123456
       - TZ=Africa/Tunis
