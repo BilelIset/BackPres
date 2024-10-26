@@ -8,7 +8,7 @@ import java.util.List;
 public interface AppUserInterface {
     AppRole AddNewRole(AppRole appRole);
     AppUser AddUser(AppUser appUser);
-    void AddRoleToUser(String userName, String roleName);
+    boolean AddRoleToUser(String userName, String roleName);
     AppUser LoadUserByUserName(String userName);
     List<AppUser> ListUser();
 

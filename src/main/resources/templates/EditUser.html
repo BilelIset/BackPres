@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="template">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css">
+    <script src="/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    <title>Ajouter Utilisateur</title>
+</head>
+<body>
+<div layout:fragment="content1" class="container my-2">
+    <div class="container mt-2">
+        <div class="card">
+            <div class="card-header">
+                <h2 th:text="'Editer : '+${userEdit.nom}+' '+${userEdit.prenom}"></h2>
+            </div>
+            <div class="card-body mt-4">
+
+                <form th:action="@{/saveUser}" th:object="${userEdit}" method="post" class="row g-3">
+
+                    <!-- Username -->
+                    <div class="col-md-6">
+                        <label for="username" class="form-label">Nom d'utilisateur</label>
+                        <input type="text" th:field="${userEdit.username}" class="form-control" id="username" placeholder="Nom d'utilisateur" required>
+                    </div>
+                    <div class="col-md-6 card" style="display:flex">
+<div style="display:inline-flex" class="card-body">
+                        <img style="width:150px;height:150px;" th:src="${userEdit.photo}" class="form-control" id="photo">
+    <div class="container m-lg-4">
+        <h5>Résumé :</h5><br>
+
+        <!-- Section Nom et Prénom -->
+        <div class="d-flex flex-wrap align-items-center mb-3">
+            <h6 class="me-2">Nom et Prénom :</h6>
+            <h6 class="text-secondary" th:text="${userEdit.nom} + ' ' + ${userEdit.prenom}"></h6>
+        </div>
+
+        <!-- Section Rôles accordés -->
+        <div class="d-flex flex-wrap align-items-center mb-3">
+            <h6 class="me-2">Rôle(s) accordé :</h6>
+            <ol class="list-unstyled m-0 ps-3">
+                <li th:each="role : ${roleCollection}" class="text-secondary" th:text="${role.roleName}"></li>
+            </ol>
+        </div>
+
+        <!-- Section Téléphone -->
+        <div class="d-flex flex-wrap align-items-center mb-3">
+            <h6 class="me-2">Tel° :</h6>
+            <h6 class="text-secondary" th:text="${userEdit.telephone1}"></h6>
+        </div>
+    </div>
+
+</div>
+                        <div class="card-header">
+                <br>  <h6><a th:href="@{/AddUserPhoto?us=}+${userEdit.username}">Changer Photo</a> </h6></div>
+                    </div>
+                    <!-- Nom -->
+                    <div class="col-md-6">
+                        <label for="nom" class="form-label">Nom</label>
+                        <input type="text" th:field="${userEdit.nom}" class="form-control" id="nom" placeholder="Nom" required>
+                    </div>
+
+                    <!-- Prénom -->
+                    <div class="col-md-6">
+                        <label for="prenom" class="form-label">Prénom</label>
+                        <input type="text" th:field="${userEdit.prenom}" class="form-control" id="prenom" placeholder="Prénom" required>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="col-md-6">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" th:field="${userEdit.email}" class="form-control" id="email" placeholder="Email" required>
+                    </div>
+
+                    <!-- Adresse 1 -->
+                    <div class="col-md-6">
+                        <label for="adresse" class="form-label">Adresse</label>
+                        <input type="text" th:field="${userEdit.adresse}" class="form-control" id="adresse" placeholder="Adresse">
+                    </div>
+
+                    <!-- Adresse 2 -->
+                    <div class="col-md-6">
+                        <label for="adresse2" class="form-label">Adresse 2</label>
+                        <input type="text" th:field="${userEdit.adresse2}" class="form-control" id="adresse2" placeholder="Adresse complémentaire">
+                    </div>
+
+                    <!-- Date de Naissance -->
+
+
+                    <!-- Téléphone 1 -->
+                    <div class="col-md-6">
+                        <label for="telephone1" class="form-label">Téléphone 1</label>
+                        <input type="text" th:field="${userEdit.telephone1}" class="form-control" id="telephone1" placeholder="Téléphone">
+                    </div>
+
+                    <!-- Téléphone 2 -->
+                    <div class="col-md-6">
+                        <label for="telephone2" class="form-label">Téléphone 2</label>
+                        <input type="text" th:field="${userEdit.telephone2}" class="form-control" id="telephone2" placeholder="Téléphone secondaire">
+                    </div>
+
+                    <!-- Téléphone 3 -->
+                    <div class="col-md-6">
+                        <label for="telephone3" class="form-label">Téléphone 3</label>
+                        <input type="text" th:field="${userEdit.telephone3}" class="form-control" id="telephone3" placeholder="Téléphone supplémentaire">
+                    </div>
+
+                    <!-- Actif -->
+                    <div class="col-md-6">
+                        <label for="actif" class="form-label">Actif</label>
+                        <select th:field="${userEdit.actif}" class="form-select" id="actif">
+                            <option value="true">Oui</option>
+                            <option value="false">Non</option>
+                        </select>
+                    </div>
+
+                    <!-- Mot de passe -->
+                    <div class="col-md-6">
+                        <label for="password" class="form-label">Mot de passe</label>
+                        <input type="password" th:field="${userEdit.password}" class="form-control" id="password" placeholder="Mot de passe" required>
+                    </div>
+
+                    <!-- Photo -->
+
+
+                    <!-- Rôles -->
+                    <div class="col-md-6">
+                        <label for="roles" class="form-label">Rôles</label><a class="m-lg-2" th:href="@{AddUserRole?us=}+${userEdit.username}">Editer </a>
+                        <Ol multiple th:field="${roleCollection}" class="form-select" id="roles">
+                            <li th:each="role : ${roleCollection}" th:value="${role}" th:text="${role.roleName}"></li>
+                        </Ol>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    </div>
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

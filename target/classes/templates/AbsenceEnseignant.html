@@ -9,25 +9,20 @@
     <link rel="stylesheet" href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css">
     <script src="/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="/webjars/bootstrap-icons/1.10.5/font/bootstrap-icons.css">
-
-
 </head>
 <body>
 
 <div layout:fragment="content1">
-
     <div class="container mt-2">
         <div class="card">
             <div class="card-header">
                 <h1>Absences Enseignants</h1>
             </div>
             <div class="container">
-                <form  class="form" method="get" th:action="${AbsenceEnseignant}">
-                        <input type="text" placeholder="Rechercher Enseignant" name="keyword" th:value="${keyword}">
-
+                <form class="form" method="get" th:action="@{/AbsenceEnseignant}">
+                    <input type="text" placeholder="Rechercher Enseignant" name="keyword" th:value="${keyword}">
                     <button class="btn btn-outline-light" type="submit">Rechercher</button>
                 </form>
-
             </div>
             <div class="card-body">
                 <table class="table table-striped">
@@ -43,10 +38,10 @@
                         <th>Date</th>
                         <th>Notifié</th>
                         <th></th>
-
                     </tr>
                     </thead>
-                    <tbody><tr th:each="abs : ${listAbsence}">
+                    <tbody>
+                    <tr th:each="abs : ${listAbsence}">
                         <td th:text="${abs.nom_salle}"></td>
                         <td th:text="${abs.nom_matiere}"></td>
                         <td th:text="${abs.ensi1}"></td>
@@ -55,27 +50,25 @@
                         <td th:text="${abs.annee1}"></td>
                         <td th:text="${abs.nom_jour}"></td>
                         <td th:text="${abs.date}"></td>
-                        <td th:text="${abs.notified?'Oui':'Non'}"></td>
+                        <td th:text="${abs.notified ? 'Oui' : 'Non'}"></td>
                         <td>
-                            <button class="btn btn-primary">Notifier </button></td>
-
+                            <button class="btn btn-primary">Notifier</button>
                         </td>
                     </tr>
                     </tbody>
                 </table>
             </div>
             <div class="card-footer">
-                <ul class="nav nav-pills ">
-                    <li th:each="page,status:${pages}">
-                        <a th:class="${status.index==currentPage?'btn btn-primary m-lg-1':'btn btn-outline-primary m-lg-1'}"
-                           th:text="${status.index+1}" th:action="@{AbsenceEnseignant(page=${status.index},keyword=${keyword})}"></a>
+                <ul class="nav nav-pills">
+                    <li th:each="page, status : ${pages}">
+                        <a th:class="${status.index == currentPage ? 'btn btn-primary m-lg-1' : 'btn btn-outline-primary m-lg-1'}"
+                           th:href="@{/AbsenceEnseignant(page=${status.index}, keyword=${keyword})}"
+                           th:text="${status.index + 1}"></a>
                     </li>
-
                 </ul>
             </div>
         </div>
     </div>
 </div>
 </body>
-
 </html>

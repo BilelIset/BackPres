@@ -53,12 +53,12 @@ auth.userDetailsService(new UserDetailsService() {
 
         http
                 .authorizeRequests()
-                .antMatchers("/login","/static/chart.js","/deconnect", "/webjars/bootstrap/5.3.3/css/bootstrap.min.css",
+                .antMatchers("/login","/webjars/jquery/3.6.0/jquery.min.js","/static/chart.js","/deconnect", "/webjars/bootstrap/5.3.3/css/bootstrap.min.css",
                         "/webjars/bootstrap-icons/1.10.5/font/bootstrap-icons.css",
                         "/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js", "/logo.png",
                         "/error")
                 .permitAll()
-                .antMatchers("/AbsenceEnseignant", "/AbsenceEtudiant", "/Dashboard","/actuator/**")
+                .antMatchers("/AbsenceEnseignant", "https://www.apirest.tech/downloads/**","/AbsenceEtudiant", "/Dashboard","/actuator/**")
                 .hasRole("ADMIN").antMatchers("/EspaceEnseignant").hasRole("ENSEIGNANT") // Remplacez "YOUR_ROLE" par le rôle approprié
                 .anyRequest()
                 .authenticated()

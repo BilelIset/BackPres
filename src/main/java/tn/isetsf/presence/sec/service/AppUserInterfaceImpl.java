@@ -36,11 +36,18 @@ public class AppUserInterfaceImpl implements AppUserInterface {
     }
 
     @Override
-    public void AddRoleToUser(String userName, String roleName) {
+    public boolean AddRoleToUser(String userName, String roleName) {
         AppUser appUser=appUserRepo.findByUsername(userName);
         AppRole appRole=appRoleRepo.findByRoleName(roleName);
-        appUser.getRoleCollection().add(appRole);
-
+        if( appUser.getRoleCollection().contains(appRole)){
+            System.out.println("Role deja existant");
+            return false;
+        }else {
+            appUser.getRoleCollection().add(appRole);
+            appUserRepo.save(appUser);
+            System.out.println("Role ajouté avec success");
+            return true;
+        }
     }
 
     @Override

@@ -8,19 +8,25 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.context.annotation.Bean;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.session.SessionIdChangedEvent;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.session.InMemoryWebSessionStore;
+import tn.isetsf.presence.sec.entity.AppRole;
+import tn.isetsf.presence.sec.entity.AppUser;
 import tn.isetsf.presence.sec.repository.AppRoleRepo;
 import tn.isetsf.presence.sec.repository.AppUserRepo;
 import tn.isetsf.presence.sec.service.AppUserInterfaceImpl;
 
 
 import javax.servlet.http.HttpSession;
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -51,7 +57,7 @@ public class PresenceApplication {
 
 
 
-}
+
 
 //		int index = 0, indexdouble = 0;
 //
@@ -90,25 +96,53 @@ public class PresenceApplication {
 //
 //	}
 //
-//	@Bean
-//	CommandLineRunner start(AppUserInterfaceImpl appUserInterface) {
-//		return args -> {
+	@Bean
+	CommandLineRunner start(AppUserInterfaceImpl appUserInterface) {
+		return args -> {
+//			AppUser appUser=appUserRepo.findByUsername("user2");
+//			if(appUser!=null){
+//				appUser.setActif(true);
+//				appUserRepo.save(appUser);
+//				System.out.println("Déactivé avec success ...");
+//			}
+//			AppUser appUser=appUserRepo.findByUsername("admin");
+//			if(appUser!=null){
+//				appUser.setActif(true);
+//			}
+//			AppUser appUser2=appUserRepo.findByUsername("user2");
+//			if(appUser2!=null){
+//				appUser2.setActif(true);
+//			}
 
-//appUserInterface.AddUser(new AppUser(null,"user1","1234",new ArrayList<>()));
-//			appUserInterface.AddUser(new AppUser(null,"admin","1234",new ArrayList<>()));
-//			appUserInterface.AddUser(new AppUser(null,"user2","1234",new ArrayList<>()));
-//			appUserInterface.AddUser(new AppUser(null,"user3","1234",new ArrayList<>()));
-//			appUserInterface.AddUser(new AppUser(null,"user4","1234",new ArrayList<>()));
-//			appUserInterface.AddRoleToUser("user1","AGENT");
+//			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+//
+//			LocalDate dateNaissance = LocalDate.parse("30-12-1985", formatter);
+//appUserInterface.AddRoleToUser("admin","ADMIN");
+//appUserInterface.AddRoleToUser("user2","ENSEIGNANT");
+
+//			appUserInterface.AddUser(new AppUser(null,"admin","BENABDALLAH","Bilel","Sfax",null,"bilelbenabdallah31@gmail.com", dateNaissance,
+//					98186144,null,null,null,"1234",null));
+//			appUserInterface.AddUser(new AppUser(null,"user2","aa","bb","nn",null,"gg@gmail.com", dateNaissance,
+//					22,null,null,null,"1234",null));
+//System.out.println(appUserRepo.findAll());
+
+//			appRoleRepo.save(new AppRole(null, "ADMIN"));
+//			appRoleRepo.save(new AppRole(null, "ENSEIGNANT"));
+//			appRoleRepo.save(new AppRole(null, "ETUDIANT"));
 //			appUserInterface.AddRoleToUser("admin","ADMIN");
-//			appUserInterface.AddRoleToUser("user2","ENSEIGNANT");
-//			appUserInterface.AddRoleToUser("user3","ETUDIANT");
-//			appUserInterface.AddRoleToUser("admin","AGENT");
-//
-////appUserRepo.deleteAll();
-//			System.out.println(appUserInterface.ListUser());
-//
-//		};
+//			appUserInterface.AddRoleToUser("admin","ETUDIANT");
+
+//appUserRepo.findByUsername("amdin");
+			//appUserRepo.deleteById(15);
+//			System.out.println(appUserRepo.findAll());
+
+		};}}
+
+
+
+
+
+
 //	}
 
 
