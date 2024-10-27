@@ -376,19 +376,20 @@ model.addAttribute("delete",delete);
             if (newUser != null) {
                 //newUser.setUsername(newUser.getUsername());
 
-                appUser.setAdresse(newUser.getAdresse()); // Peut être null
-                appUser.setAdresse2(newUser.getAdresse2()); // Peut être null
-                appUser.setTelephone1(newUser.getTelephone1()); // Peut être null
-                appUser.setTelephone2(newUser.getTelephone2()); // Peut être null
-                appUser.setTelephone3(newUser.getTelephone3()); // Peut être null
-                appUser.setEmail(newUser.getEmail());
+                newUser.setAdresse(appUser.getAdresse()); // Peut être null
+                newUser.setAdresse2(appUser.getAdresse2()); // Peut être null
+                newUser.setTelephone1(appUser.getTelephone1()); // Peut être null
+                newUser.setTelephone2(appUser.getTelephone2()); // Peut être null
+                newUser.setTelephone3(appUser.getTelephone3()); // Peut être null
+                newUser.setEmail(appUser.getEmail());
 
 
                 // Vous pouvez également conserver les valeurs non modifiées pour les autres champs requis
                 System.out.println("Utilisateur qui va etre enregistré");
-                appUserRepo.save(appUser);
+                appUserRepo.save(newUser);
                 return "redirect:/AddUserRole?us=" + newUser.getUsername();
             } else {
+                if(appUser!=null)appUserRepo.save(appUser);
                 return "redirect:/AddUserDetail?us=Erreur parvenu !";
             }
         } else {
@@ -428,6 +429,7 @@ model.addAttribute("delete",delete);
                 test.setAdresse(appUser.getAdresse());
                 test.setAdresse2(appUser.getAdresse2());
                // test.setRoleCollection(appUser.getRoleCollection());
+                appUserRepo.save(test);
             }
         }
         return "redirect:/Utilisateurs";}

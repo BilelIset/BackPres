@@ -51,7 +51,7 @@
         <ul  id="dropDown"class="dropdown-menu " aria-labelledby="dropdownMenuButton1">
             <li><div class="text-center"><img class="img-fluid  " style="width:150px;height:150px" th:src="@{${user.photo}}"></div></li>
             <br>
-            <li class="text-secondary text-left" style="border-top:solid  0.5px"><a class="dropdown-item text-left text-secondary" href="/Profile"><i class="bi bi-person-circle m-lg-2"></i>Profile</a></li>
+            <li class="text-secondary text-left" style="border-top:solid  0.5px"><a class="dropdown-item text-left text-secondary" th:href="@{/EditUser}+'?id='+${user.id}"><i class="bi bi-person-circle m-lg-2"></i>Profile</a></li>
 
             <li class="text-secondary" style="border-top:solid  1px"><a  class="dropdown-item text-secondary" href="/deconnect">Deconnecter<i class="bi bi-box-arrow-right m-lg-2"></i></a></li>
         </ul>
