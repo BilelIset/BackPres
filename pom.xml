@@ -84,6 +84,12 @@
 			<artifactId>commons-net</artifactId>
 			<version>3.11.0</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework.integration/spring-integration-ftp -->
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-ftp</artifactId>
+			<version>6.3.5</version>
+		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.webjars/bootstrap -->
 		<dependency>

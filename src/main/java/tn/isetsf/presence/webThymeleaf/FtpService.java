@@ -1,50 +1,82 @@
 package tn.isetsf.presence.webThymeleaf;
 
-
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.time.LocalDateTime;
 
 @Service
 public class FtpService {
 
-    private final String server = "51.77.210.237"; // Remplacez par l'adresse IP de votre VPS
-    private final int port = 21; // Port par défaut pour FTP
-    private final String user = "spring"; // Nom d'utilisateur FTP
-    private final String pass = "123456"; // Mot de passe FTP
+    @Value("${ftp.server}")
+    private String server;
 
-    public void uploadFile(String localFilePath, String remoteFilePath) throws IOException {
+    @Value("${ftp.port}")
+    private int port;
+
+    @Value("${ftp.username}")
+    private String user;
+
+    @Value("${ftp.password}")
+    private String pass;
+
+    private final String uploadsDirectory = "/spring/ftp/uploads/"; // Répertoire sur le serveur FTP
+
+    // Méthode pour téléverser un fichier sur le serveur FTP
+    public void uploadFile(MultipartFile file, String remoteFileName) throws IOException {
         FTPClient ftpClient = new FTPClient();
-        ftpClient.connect(server, port);
-        ftpClient.enterLocalPassiveMode();
+        try {
+            ftpClient.connect(server, port);
+            ftpClient.login(user, pass);
+            if (!ftpClient.isConnected()) {
+                System.out.println("Échec de la connexion au serveur FTP.");
+            }
 
-        ftpClient.login(user, pass);
-        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
+            String fullRemotePath = "uploads/" + remoteFileName; // Chemin relatif depuis le répertoire d'accueil de l'utilisateur
 
+            try (InputStream input = file.getInputStream()) {
+                boolean success = ftpClient.storeFile(fullRemotePath, input);
+                if (success) {
+                    System.out.println("Fichier téléversé : " + fullRemotePath);
+                } else {
+                    System.out.println("Échec du téléversement : " + fullRemotePath);
+                }
 
-    }
-
-    public void downloadFile(String remoteFilePath, String localFilePath) throws IOException {
-        FTPClient ftpClient = new FTPClient();
-        ftpClient.connect("51.77.210.237", 21); // Remplacez par l'adresse IP correcte de votre VPS
-        ftpClient.enterLocalPassiveMode();
-
-        ftpClient.login(user, pass);
-        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-
-        try (FileOutputStream output = new FileOutputStream(localFilePath)) {
-            ftpClient.retrieveFile(remoteFilePath, output);
+            }
         } finally {
             ftpClient.logout();
             ftpClient.disconnect();
         }
+
     }
-}
+
+    // Méthode pour supprimer un fichier sur le serveur FTP
+    public void deleteFile(String fileName) throws IOException {
+        FTPClient ftpClient = new FTPClient();
+        try {
+            ftpClient.connect(server, port);
+            ftpClient.login(user, pass);
+
+            String fullRemotePath = "uploads/" + fileName; // Chemin relatif depuis le répertoire d'accueil de l'utilisateur
+
+            boolean deleted = ftpClient.deleteFile(fullRemotePath);
+            if (deleted) {
+                System.out.println("Fichier supprimé : " + fullRemotePath);
+            } else {
+                System.out.println("Échec de la suppression du fichier : " + fullRemotePath);
+            }
+        } finally {
+            ftpClient.logout();
+            ftpClient.disconnect();
+        }
+    }}

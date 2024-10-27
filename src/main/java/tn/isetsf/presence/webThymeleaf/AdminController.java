@@ -316,6 +316,9 @@ public class AdminController {
 
 
     }
+
+    @Autowired
+    private FtpService ftpService;
     @PostMapping(path = "/saveUserDetail")
     public String SaveUserDetail( @RequestParam(value = "us", defaultValue = "") String us, @ModelAttribute(value = "newUser") AppUser appUser) {
         System.out.println("path recu sur details poste   : " +us);
@@ -391,8 +394,10 @@ public class AdminController {
 
         return "AddUserPhoto";
     }
+    private final String uploadsDirectory = "/spring/ftp/uploads/"; // Répertoire sur le serveur FTP
+
     @PostMapping(path = "/AddUserImg")
-    public String AddUserImg(Model model, @RequestParam String us, @RequestParam("photo") MultipartFile photo) throws IOException {
+    public String addUserImg(Model model, @RequestParam String us, @RequestParam("photo") MultipartFile photo) throws IOException {
         System.out.println("Received " + us);
 
         if (us != null) {
@@ -402,11 +407,11 @@ public class AdminController {
             if (appUser != null) {
                 // Si l'utilisateur a déjà une photo, supprimez-la du serveur FTP
                 if (appUser.getPhoto() != null && !appUser.getPhoto().isEmpty()) {
-                    System.out.println("ancien path de image :" + appUser.getPhoto());
+                    System.out.println("Ancien path de l'image :" + appUser.getPhoto());
 
                     // Extraire le nom de fichier pour la suppression
                     String oldFileName = appUser.getPhoto().substring(appUser.getPhoto().lastIndexOf("/") + 1);
-                    deleteFileFromFtp(oldFileName); // Méthode pour supprimer le fichier du serveur FTP
+                    ftpService.deleteFile(oldFileName); // Méthode pour supprimer le fichier du serveur FTP
                 }
 
                 // Vérifiez le format du fichier
@@ -420,13 +425,12 @@ public class AdminController {
 
                 // Créez un nom de fichier unique pour le téléversement
                 String newFileName = appUser.getUsername() + LocalDateTime.now().toString().replace(":", "_").replace(".", "_") + extension;
-                String remoteFilePath = "/images/" + newFileName; // Chemin sur le serveur FTP
 
                 // Téléversez le fichier sur le serveur FTP
-                uploadFileToFtp(photo, remoteFilePath); // Méthode pour téléverser le fichier
+                ftpService.uploadFile(photo, newFileName); // Méthode pour téléverser le fichier
 
                 // Mettez à jour l'utilisateur avec le nouveau chemin de photo
-                appUser.setPhoto(remoteFilePath);
+                appUser.setPhoto(uploadsDirectory + newFileName); // Mettez à jour avec le chemin complet
                 appUserRepo.save(appUser);
                 return "redirect:/AddUserPhoto?us=" + appUser.getUsername();
             }
@@ -436,40 +440,6 @@ public class AdminController {
         return "redirect:/AddUserPhoto?us=" + us;
     }
 
-    // Méthode pour téléverser un fichier sur le serveur FTP
-    private void uploadFileToFtp(MultipartFile file, String remoteFilePath) throws IOException {
-        FTPClient ftpClient = new FTPClient();
-        ftpClient.connect("votre_ip_vps", 21); // Remplacez par votre adresse IP
-        ftpClient.login("votre_nom_utilisateur", "votre_mot_de_passe"); // Identifiants FTP
-        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-
-        try (InputStream input = file.getInputStream()) {
-            ftpClient.storeFile(remoteFilePath, input);
-            System.out.println("Fichier téléversé : " + remoteFilePath);
-        } finally {
-            ftpClient.logout();
-            ftpClient.disconnect();
-        }
-    }
-
-    // Méthode pour supprimer un fichier sur le serveur FTP
-    private void deleteFileFromFtp(String fileName) throws IOException {
-        FTPClient ftpClient = new FTPClient();
-        ftpClient.connect("votre_ip_vps", 21); // Remplacez par votre adresse IP
-        ftpClient.login("votre_nom_utilisateur", "votre_mot_de_passe"); // Identifiants FTP
-
-        try {
-            boolean deleted = ftpClient.deleteFile("/images/" + fileName);
-            if (deleted) {
-                System.out.println("Fichier supprimé : " + fileName);
-            } else {
-                System.out.println("Échec de la suppression du fichier : " + fileName);
-            }
-        } finally {
-            ftpClient.logout();
-            ftpClient.disconnect();
-        }
-    }
 
 
 
