@@ -394,7 +394,7 @@ public class AdminController {
 
         return "AddUserPhoto";
     }
-    private final String uploadsDirectory = "/spring/ftp/uploads/"; // Répertoire sur le serveur FTP
+    private final String uploadsDirectory = "https://www.apirest.tech/downloads/uploads/"; // Répertoire sur le serveur FTP
 
     @PostMapping(path = "/AddUserImg")
     public String addUserImg(Model model, @RequestParam String us, @RequestParam("photo") MultipartFile photo) throws IOException {
@@ -411,6 +411,7 @@ public class AdminController {
 
                     // Extraire le nom de fichier pour la suppression
                     String oldFileName = appUser.getPhoto().substring(appUser.getPhoto().lastIndexOf("/") + 1);
+                    System.out.println("Path de suppression"+oldFileName);
                     ftpService.deleteFile(oldFileName); // Méthode pour supprimer le fichier du serveur FTP
                 }
 

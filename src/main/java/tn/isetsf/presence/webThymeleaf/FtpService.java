@@ -28,7 +28,8 @@ public class FtpService {
     @Value("${ftp.password}")
     private String pass;
 
-    private final String uploadsDirectory = "/spring/ftp/uploads/"; // Répertoire sur le serveur FTP
+    private final String uploadsDirectory = "/home/spring/ftp/uploads/";
+    // Répertoire sur le serveur FTP
 
     // Méthode pour téléverser un fichier sur le serveur FTP
     public void uploadFile(MultipartFile file, String remoteFileName) throws IOException {
@@ -42,7 +43,8 @@ public class FtpService {
 
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
-            String fullRemotePath = "uploads/" + remoteFileName; // Chemin relatif depuis le répertoire d'accueil de l'utilisateur
+            String fullRemotePath =uploadsDirectory  + remoteFileName; // Chemin relatif depuis le répertoire d'accueil de l'utilisateur
+            ftpClient.enterLocalPassiveMode();
 
             try (InputStream input = file.getInputStream()) {
                 boolean success = ftpClient.storeFile(fullRemotePath, input);
@@ -67,7 +69,7 @@ public class FtpService {
             ftpClient.connect(server, port);
             ftpClient.login(user, pass);
 
-            String fullRemotePath = "uploads/" + fileName; // Chemin relatif depuis le répertoire d'accueil de l'utilisateur
+            String fullRemotePath = fileName; // Chemin relatif depuis le répertoire d'accueil de l'utilisateur
 
             boolean deleted = ftpClient.deleteFile(fullRemotePath);
             if (deleted) {
