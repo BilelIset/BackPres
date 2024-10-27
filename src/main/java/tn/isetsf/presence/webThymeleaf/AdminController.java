@@ -1,5 +1,7 @@
 package tn.isetsf.presence.webThymeleaf;
 
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -390,54 +392,84 @@ public class AdminController {
         return "AddUserPhoto";
     }
     @PostMapping(path = "/AddUserImg")
-    public String AddUserImg(Model model,@RequestParam String us,@RequestParam("photo") MultipartFile photo) throws IOException {
-        System.out.println("Received "+us);
+    public String AddUserImg(Model model, @RequestParam String us, @RequestParam("photo") MultipartFile photo) throws IOException {
+        System.out.println("Received " + us);
+
         if (us != null) {
             AppUser appUser = appUserRepo.findByUsername(us);
-            if (appUser.getPhoto() != null && !appUser.getPhoto().isEmpty()) {
-                System.out.println("ancien path de image :"+appUser.getPhoto());
-                File ancienImage = new File(""+appUser.getPhoto());
-                if (ancienImage.exists()) {
-                    boolean deleted = ancienImage.delete();
-                    if (!deleted) {
-                        System.out.println("Échec de la suppression de l'ancienne image : " + appUser.getPhoto());
-                    } else {
-                        System.out.println("Ancienne image supprimée avec succès.");
-                    }
-                } else {
-                    System.out.println("Le fichier n'existe pas : " + appUser.getPhoto());
+
+            // Vérifiez si l'utilisateur existe
+            if (appUser != null) {
+                // Si l'utilisateur a déjà une photo, supprimez-la du serveur FTP
+                if (appUser.getPhoto() != null && !appUser.getPhoto().isEmpty()) {
+                    System.out.println("ancien path de image :" + appUser.getPhoto());
+
+                    // Extraire le nom de fichier pour la suppression
+                    String oldFileName = appUser.getPhoto().substring(appUser.getPhoto().lastIndexOf("/") + 1);
+                    deleteFileFromFtp(oldFileName); // Méthode pour supprimer le fichier du serveur FTP
                 }
 
-            }
-
-            if(appUser!=null){
-
-                File uploadDir = new File("");
-                if (!uploadDir.exists()) {
-                    uploadDir.mkdirs();
-                }
+                // Vérifiez le format du fichier
                 String extension = photo.getOriginalFilename().substring(photo.getOriginalFilename().lastIndexOf("."));
-                String errFormat="";
-                if(!extension.equals(".jpg")){
-                    errFormat="Format .jpg uniquement";
-                    model.addAttribute("errorFormat",errFormat);
-                    return "redirect:/AddUserPhoto ";
-
+                String errFormat = "";
+                if (!extension.equalsIgnoreCase(".jpg")) {
+                    errFormat = "Format .jpg uniquement";
+                    model.addAttribute("errorFormat", errFormat);
+                    return "redirect:/AddUserPhoto";
                 }
-                String newFileName = appUser.getUsername()+ LocalDateTime.now().toString().replace(":","_").replace(".","_")+ extension;
-                Path path = Paths.get("" + newFileName);
-                System.out.println(path.toString());
-                Files.write(path, photo.getBytes());
-                appUser.setPhoto("/"+newFileName);
+
+                // Créez un nom de fichier unique pour le téléversement
+                String newFileName = appUser.getUsername() + LocalDateTime.now().toString().replace(":", "_").replace(".", "_") + extension;
+                String remoteFilePath = "/images/" + newFileName; // Chemin sur le serveur FTP
+
+                // Téléversez le fichier sur le serveur FTP
+                uploadFileToFtp(photo, remoteFilePath); // Méthode pour téléverser le fichier
+
+                // Mettez à jour l'utilisateur avec le nouveau chemin de photo
+                appUser.setPhoto(remoteFilePath);
                 appUserRepo.save(appUser);
-                return "redirect:/AddUserPhoto?us="+appUser.getUsername();
+                return "redirect:/AddUserPhoto?us=" + appUser.getUsername();
             }
         }
-        String success="";
-        model.addAttribute("success",success);
-        return "redirect:/AddUserPhoto?us="+us;
+        String success = "";
+        model.addAttribute("success", success);
+        return "redirect:/AddUserPhoto?us=" + us;
     }
 
+    // Méthode pour téléverser un fichier sur le serveur FTP
+    private void uploadFileToFtp(MultipartFile file, String remoteFilePath) throws IOException {
+        FTPClient ftpClient = new FTPClient();
+        ftpClient.connect("votre_ip_vps", 21); // Remplacez par votre adresse IP
+        ftpClient.login("votre_nom_utilisateur", "votre_mot_de_passe"); // Identifiants FTP
+        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+        try (InputStream input = file.getInputStream()) {
+            ftpClient.storeFile(remoteFilePath, input);
+            System.out.println("Fichier téléversé : " + remoteFilePath);
+        } finally {
+            ftpClient.logout();
+            ftpClient.disconnect();
+        }
+    }
+
+    // Méthode pour supprimer un fichier sur le serveur FTP
+    private void deleteFileFromFtp(String fileName) throws IOException {
+        FTPClient ftpClient = new FTPClient();
+        ftpClient.connect("votre_ip_vps", 21); // Remplacez par votre adresse IP
+        ftpClient.login("votre_nom_utilisateur", "votre_mot_de_passe"); // Identifiants FTP
+
+        try {
+            boolean deleted = ftpClient.deleteFile("/images/" + fileName);
+            if (deleted) {
+                System.out.println("Fichier supprimé : " + fileName);
+            } else {
+                System.out.println("Échec de la suppression du fichier : " + fileName);
+            }
+        } finally {
+            ftpClient.logout();
+            ftpClient.disconnect();
+        }
+    }
 
 
 
