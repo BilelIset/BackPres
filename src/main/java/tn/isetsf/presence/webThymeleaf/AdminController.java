@@ -68,7 +68,7 @@ public class AdminController {
     LoggedRepo loggedRepo;
     @Autowired
     AppRoleRepo appRoleRepo;
-@Autowired
+    @Autowired
     AppUserInterfaceImpl appUserInterface;
 
 
@@ -154,9 +154,9 @@ public class AdminController {
                 return "redirect:/AddUser?us=" + s;
 
             }}
-            appUserRepo.save(appUser);
+        appUserRepo.save(appUser);
         System.out.println("Utilisateur enregistré : "+appUser.getUsername());
-            return "redirect:/AddUserDetail?us="+appUser.getUsername();
+        return "redirect:/AddUserDetail?us="+appUser.getUsername();
 
 
 
@@ -167,8 +167,8 @@ public class AdminController {
     public String AddUserRole(Model model,@RequestParam(value = "err",defaultValue = "") String err ,@RequestParam(value = "us", defaultValue = "") String us) {
         model.addAttribute("user", findLogged());
 
-String erreur="";
-model.addAttribute("erreur",erreur);
+        String erreur="";
+        model.addAttribute("erreur",erreur);
 
 
         if (us != null && err.isEmpty()) {
@@ -177,10 +177,10 @@ model.addAttribute("erreur",erreur);
             model.addAttribute("newUser", appUser);
 
 
-                model.addAttribute("roleCollection1", appUser.getRoleCollection()); // Rôles disponibles
+            model.addAttribute("roleCollection1", appUser.getRoleCollection()); // Rôles disponibles
 
 
-                model.addAttribute("roleCollection", appRoleRepo.findAll()); // Rôles disponibles
+            model.addAttribute("roleCollection", appRoleRepo.findAll()); // Rôles disponibles
 
 
         } else if (err!=null|| !err.isEmpty()) {
@@ -188,7 +188,7 @@ model.addAttribute("erreur",erreur);
             model.addAttribute("us", us);
             model.addAttribute("newUser", appUser);
 
-erreur="Role déja accordé !";
+            erreur="Role déja accordé !";
             model.addAttribute("roleCollection1", appUser.getRoleCollection()); // Rôles disponibles
 
 
@@ -203,10 +203,10 @@ erreur="Role déja accordé !";
     public String AddRoleToUser(@RequestParam("us") String us,  @RequestParam (value = "role") String role) {
         System.out.println("Role recu " +role);
 
-   if( appUserInterface.AddRoleToUser(us, role)){
-    return "redirect:/AddUserRole?us=" + us;}else
+        if( appUserInterface.AddRoleToUser(us, role)){
+            return "redirect:/AddUserRole?us=" + us;}else
 
-            {return "redirect:/AddUserRole?us="+us+"&err=Exist";
+        {return "redirect:/AddUserRole?us="+us+"&err=Exist";
 
         }
 
@@ -259,7 +259,7 @@ erreur="Role déja accordé !";
 
         // Check if the file exists and delete it
         if (file.exists()) {
-             file.delete();  // Returns true if the deletion was successful
+            file.delete();  // Returns true if the deletion was successful
         } else {
             System.out.println("File not found: " + imageName);
 
@@ -293,13 +293,13 @@ erreur="Role déja accordé !";
     }
 
     public AppUser findLogged(){
-    Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
         if (authentication!=null){
-        String utilisateur=((UserDetails)authentication.getPrincipal()).getUsername();
-        AppUser appUser1=appUserRepo.findByUsername(utilisateur);
-        return appUser1;
+            String utilisateur=((UserDetails)authentication.getPrincipal()).getUsername();
+            AppUser appUser1=appUserRepo.findByUsername(utilisateur);
+            return appUser1;
 
-    }else return null;
+        }else return null;
     }
 
     @GetMapping(path = "/AddUserDetail")
@@ -307,16 +307,16 @@ erreur="Role déja accordé !";
 
         model.addAttribute("user",findLogged());
         model.addAttribute("us",us);
-System.out.println("Path recur user details : "+us);
-           model.addAttribute("newUser",new AppUser());
-           return "AddUserDetail";
+        System.out.println("Path recur user details : "+us);
+        model.addAttribute("newUser",new AppUser());
+        return "AddUserDetail";
 
 
 
     }
     @PostMapping(path = "/saveUserDetail")
     public String SaveUserDetail( @RequestParam(value = "us", defaultValue = "") String us, @ModelAttribute(value = "newUser") AppUser appUser) {
-       System.out.println("path recu sur details poste   : " +us);
+        System.out.println("path recu sur details poste   : " +us);
         if (us != null) {
             AppUser newUser = appUserRepo.findByUsername(us);
             System.out.println("Utilistaeur trouvé : "+newUser);
@@ -343,7 +343,7 @@ System.out.println("Path recur user details : "+us);
 
 
     @GetMapping(path = "/AddUser")
-public String addUser(Model model,@RequestParam(value = "us", defaultValue = "") String us ){
+    public String addUser(Model model,@RequestParam(value = "us", defaultValue = "") String us ){
         model.addAttribute("user",findLogged());
 
         if (us!=""){
@@ -351,7 +351,7 @@ public String addUser(Model model,@RequestParam(value = "us", defaultValue = "")
 
             model.addAttribute("newUser",new AppUser());
             List<AppRole>  list=appRoleRepo.findAll();
-           List< AppRole> appRole=new ArrayList<>();
+            List< AppRole> appRole=new ArrayList<>();
             model.addAttribute("rappRole",appRole);
             model.addAttribute("roleCollection",list);
 
@@ -360,22 +360,22 @@ public String addUser(Model model,@RequestParam(value = "us", defaultValue = "")
     }
     @PostMapping("/saveUser")
     public String uploadImage(Model model,@ModelAttribute(value = "newUser" )AppUser appUser) {
-       if(appUser!=null){
-           AppUser test=appUserRepo.findByUsername(appUser.getUsername());
-           if(test!=null){
-               test.setNom(appUser.getNom());
-               test.setPrenom(appUser.getPrenom());
-               test.setActif(appUser.isActif());
-               test.setEmail(appUser.getEmail());
-               test.setTelephone1(appUser.getTelephone1());
-               test.setTelephone2(appUser.getTelephone2());
-               test.setTelephone3(appUser.getTelephone3());
-               test.setAdresse(appUser.getAdresse());
-               test.setAdresse2(appUser.getAdresse2());
-               test.setRoleCollection(appUser.getRoleCollection());
-           }
-       }
-    return "redirect:/Utilisateurs";}
+        if(appUser!=null){
+            AppUser test=appUserRepo.findByUsername(appUser.getUsername());
+            if(test!=null){
+                test.setNom(appUser.getNom());
+                test.setPrenom(appUser.getPrenom());
+                test.setActif(appUser.isActif());
+                test.setEmail(appUser.getEmail());
+                test.setTelephone1(appUser.getTelephone1());
+                test.setTelephone2(appUser.getTelephone2());
+                test.setTelephone3(appUser.getTelephone3());
+                test.setAdresse(appUser.getAdresse());
+                test.setAdresse2(appUser.getAdresse2());
+                test.setRoleCollection(appUser.getRoleCollection());
+            }
+        }
+        return "redirect:/Utilisateurs";}
     @GetMapping(path = "/AddUserPhoto")
     public String AddUserPhoto(Model model ,@RequestParam(value = "us",defaultValue = "")String us){
         model.addAttribute("user",findLogged());
@@ -391,12 +391,12 @@ public String addUser(Model model,@RequestParam(value = "us", defaultValue = "")
     }
     @PostMapping(path = "/AddUserImg")
     public String AddUserImg(Model model,@RequestParam String us,@RequestParam("photo") MultipartFile photo) throws IOException {
-System.out.println("Received "+us);
+        System.out.println("Received "+us);
         if (us != null) {
             AppUser appUser = appUserRepo.findByUsername(us);
             if (appUser.getPhoto() != null && !appUser.getPhoto().isEmpty()) {
                 System.out.println("ancien path de image :"+appUser.getPhoto());
-                File ancienImage = new File("src/main/resources/static"+appUser.getPhoto());
+                File ancienImage = new File("./static/"+appUser.getPhoto());
                 if (ancienImage.exists()) {
                     boolean deleted = ancienImage.delete();
                     if (!deleted) {
@@ -408,11 +408,11 @@ System.out.println("Received "+us);
                     System.out.println("Le fichier n'existe pas : " + appUser.getPhoto());
                 }
 
-        }
+            }
 
-        if(appUser!=null){
+            if(appUser!=null){
 
-                File uploadDir = new File(UPLOAD_DIR);
+                File uploadDir = new File("./static/");
                 if (!uploadDir.exists()) {
                     uploadDir.mkdirs();
                 }
@@ -425,14 +425,14 @@ System.out.println("Received "+us);
 
                 }
                 String newFileName = appUser.getUsername()+ LocalDateTime.now().toString().replace(":","_").replace(".","_")+ extension;
-                Path path = Paths.get(UPLOAD_DIR + newFileName);
+                Path path = Paths.get("./static/" + newFileName);
                 System.out.println(path.toString());
                 Files.write(path, photo.getBytes());
-                appUser.setPhoto("/uploads/"+newFileName);
+                appUser.setPhoto("/"+newFileName);
                 appUserRepo.save(appUser);
                 return "redirect:/AddUserPhoto?us="+appUser.getUsername();
             }
-            }
+        }
         String success="";
         model.addAttribute("success",success);
         return "redirect:/AddUserPhoto?us="+us;
@@ -516,10 +516,10 @@ System.out.println(path.toString());
         model.addAttribute("user",findLogged());
 
         List<Logged> loggedList=loggedRepo.findByConnectedTrue();
-System.out.println("Utilisateur trouvé a la connection"+loggedList);
-System.out.println("Utilisateur trouvé apres l'erreur"+loggedList);
-System.out.println(loggedList);
-model.addAttribute("loggedList",loggedList);
+        System.out.println("Utilisateur trouvé a la connection"+loggedList);
+        System.out.println("Utilisateur trouvé apres l'erreur"+loggedList);
+        System.out.println(loggedList);
+        model.addAttribute("loggedList",loggedList);
         int notifiedCount = 0;
         Page<LigneAbsence> absencePage = ligneAbsenceRepo.findByEnsi1Contains(keyword, PageRequest.of(page, size));
 
@@ -529,7 +529,7 @@ model.addAttribute("loggedList",loggedList);
             }
         }
 
-boolean mobileServer = serverStatusService.checkMobileAppServerStatus("https://www.apirest.tech/emploi/all");
+        boolean mobileServer = serverStatusService.checkMobileAppServerStatus("https://www.apirest.tech/emploi/all");
         System.out.println("Mobile "+mobileServer);
         boolean mailServer=true;// = serverStatusService.checkMailServer();
         System.out.println("Mail "+mailServer);
@@ -587,7 +587,6 @@ boolean mobileServer = serverStatusService.checkMobileAppServerStatus("https://w
 
 
 
-    return objects;
+        return objects;
 
-}}
-
+    }}
