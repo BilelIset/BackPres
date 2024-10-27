@@ -43,13 +43,13 @@
         </div>
 
         <div class="navbar-text text-light ms-auto">
-            <img class="navbar-brand img-fluid rounded-circle img-thumbnail" alt="Thumbnail image" style="width:50px; height:50px;" th:src="@{${user.photo}}"/>
+            <img class="navbar-brand img-fluid rounded-circle img-thumbnail" alt="Thumbnail image" style="width:50px; height:50px;" th:src="${user.photo}"/>
         </div>
     <div class="dropdown ms-auto">
         <button th:text="${user.nom}+' '+${user.prenom}" class="btn btn-outline-light dropdown-toggle" onclick="toggleShow()" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
         </button>
         <ul  id="dropDown"class="dropdown-menu " aria-labelledby="dropdownMenuButton1">
-            <li><div class="text-center"><img class="img-fluid  " style="width:150px;height:150px" th:src="@{${user.photo}}"></div></li>
+            <li><div class="text-center"><img class="img-fluid  " style="width:150px;height:150px" th:src="${user.photo}"></div></li>
             <br>
             <li class="text-secondary text-left" style="border-top:solid  0.5px"><a class="dropdown-item text-left text-secondary" th:href="@{/EditUser}+'?id='+${user.id}"><i class="bi bi-person-circle m-lg-2"></i>Profile</a></li>
 

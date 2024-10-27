@@ -5,10 +5,9 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard</title>
+  <title>Ajouter Utilisateur</title>
   <link rel="stylesheet" href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css">
   <script src="/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
-    <title>Ajouter Utilisateur</title>
 </head>
 <body>
 <div layout:fragment="content1" class="container my-2">
@@ -30,15 +29,15 @@
       <!-- Username -->
       <div class="col-md-6">
         <label for="username" class="form-label ">Nom d'utilisateur</label>
-        <input type="text" th:field="*{newUser.username}" class="form-control" id="username" placeholder="Nom d'utilisateur" required>
+        <input type="text" th:field="${newUser.username}" class="form-control" id="username" placeholder="Nom d'utilisateur" required>
       </div>
       <div class="col-md-6">
         <label for="password" class="form-label " >Mot de passe</label>
-        <input type="password" th:field="*{newUser.password}" class="form-control" id="password" placeholder="Mot de passe" required>
+        <input type="password" th:field="${newUser.password}" class="form-control" id="password" placeholder="Mot de passe" required>
       </div>
       <div class="col-md-6">
         <label for="actif" class="form-label ">Actif</label>
-        <select th:field="*{newUser.actif}" class="form-select" id="actif" required>
+        <select th:field="${newUser.actif}" class="form-select" id="actif" required>
           <option value="true">Oui</option>
           <option value="false">Non</option>
         </select>
@@ -47,13 +46,13 @@
       <!-- Nom -->
       <div class="col-md-6">
         <label for="nom" class="form-label ">Nom</label>
-        <input type="text" th:field="*{newUser.nom}" class="form-control" id="nom" placeholder="Nom" required>
+        <input type="text" th:field="${newUser.nom}" class="form-control" id="nom" placeholder="Nom" required>
       </div>
 
       <!-- Prénom -->
       <div class="col-md-6">
         <label for="prenom" class="form-label ">Prénom</label>
-        <input type="text" th:field="*{newUser.prenom}" class="form-control" id="prenom" placeholder="Prénom" required>
+        <input type="text" th:field="${newUser.prenom}" class="form-control" id="prenom" placeholder="Prénom" required>
       </div>
 
 

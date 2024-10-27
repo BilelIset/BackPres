@@ -18,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -156,7 +157,8 @@ public class AdminController {
                 return "redirect:/AddUser?us=" + s;
 
             }}
-        appUserRepo.save(appUser);
+        appUserInterface.AddUser(appUser);
+        //appUserRepo.save(appUser);
         System.out.println("Utilisateur enregistré : "+appUser.getUsername());
         return "redirect:/AddUserDetail?us="+appUser.getUsername();
 
@@ -415,8 +417,10 @@ model.addAttribute("delete",delete);
     }
     @PostMapping("/saveUser")
     public String uploadImage(Model model,@ModelAttribute(value = "newUser" )AppUser appUser) {
+        System.out.println("User received "+appUser);
         if(appUser!=null){
             AppUser test=appUserRepo.findByUsername(appUser.getUsername());
+            System.out.println("user find in base :"+test);
             if(test!=null){
                 test.setNom(appUser.getNom());
                 test.setPrenom(appUser.getPrenom());
@@ -428,7 +432,11 @@ model.addAttribute("delete",delete);
                 test.setAdresse(appUser.getAdresse());
                 test.setAdresse2(appUser.getAdresse2());
                // test.setRoleCollection(appUser.getRoleCollection());
+                System.out.println("Saved User"+test);
                 appUserRepo.save(test);
+            }
+            else {
+                appUserRepo.save(appUser);
             }
         }
         return "redirect:/Utilisateurs";}
