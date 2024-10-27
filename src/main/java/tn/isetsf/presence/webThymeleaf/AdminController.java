@@ -208,8 +208,7 @@ model.addAttribute("delete",delete);
 
             AppUser loggedUser = appUserRepo.findByUsername(findLogged().getUsername());
             if (loggedUser.getRoleCollection().stream().anyMatch(r -> "ADMIN".equals(r.getRoleName()))) {
-              //  emailService.sendSimpleEmail(loggedUser.getEmail(), "Code de vérification", rand);
-                System.out.println(rand);
+                emailService.sendSimpleEmail(loggedUser.getEmail(), "Code de vérification", rand);
                 return "redirect:/AddUserRole?us=" + us + "&adminRole=true&del=false";
             } else {
                 return "redirect:/deconnect";
