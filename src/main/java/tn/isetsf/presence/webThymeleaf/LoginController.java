@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.session.InMemoryWebSessionStore;
 import tn.isetsf.presence.sec.config.SecurityConfig;
 import tn.isetsf.presence.sec.entity.Logged;
@@ -29,7 +30,7 @@ public class LoginController {
     LoggedRepo loggedRepo;
 
     @GetMapping(path = "/login")
-    public String logUser(Model model){
+    public String logUser(Model model, @RequestParam(value = "check" ,defaultValue = "") String check){
 
         return "login"; // Retirer le slash ici
     }

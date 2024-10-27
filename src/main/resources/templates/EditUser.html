@@ -19,12 +19,12 @@
             </div>
             <div class="card-body mt-4">
 
-                <form th:action="@{/saveUser}" th:object="${userEdit}" method="post" class="row g-3">
+                <form th:action="@{/saveUserDetail?us=}+'usetEdit.username'" th:object="${userEdit}" method="post" class="row g-3">
 
                     <!-- Username -->
                     <div class="col-md-6">
                         <label for="username" class="form-label">Nom d'utilisateur</label>
-                        <input type="text" th:field="${userEdit.username}" class="form-control" id="username" placeholder="Nom d'utilisateur" required>
+                        <input readonly type="text" th:field="${userEdit.username}" class="form-control" id="username" placeholder="Nom d'utilisateur" required>
                     </div>
                     <div class="col-md-6 card" style="display:flex">
 <div style="display:inline-flex" class="card-body">
@@ -108,36 +108,27 @@
                         <input type="text" th:field="${userEdit.telephone3}" class="form-control" id="telephone3" placeholder="Téléphone supplémentaire">
                     </div>
 
-                    <!-- Actif -->
-                    <div class="col-md-6">
-                        <label for="actif" class="form-label">Actif</label>
-                        <select th:field="${userEdit.actif}" class="form-select" id="actif">
-                            <option value="true">Oui</option>
-                            <option value="false">Non</option>
-                        </select>
-                    </div>
 
-                    <!-- Mot de passe -->
-                    <div class="col-md-6">
-                        <label for="password" class="form-label">Mot de passe</label>
-                        <input type="password" th:field="${userEdit.password}" class="form-control" id="password" placeholder="Mot de passe" required>
-                    </div>
+
+
 
                     <!-- Photo -->
 
 
                     <!-- Rôles -->
-                    <div class="col-md-6">
-                        <label for="roles" class="form-label">Rôles</label><a class="m-lg-2" th:href="@{AddUserRole?us=}+${userEdit.username}">Editer </a>
-                        <Ol multiple th:field="${roleCollection}" class="form-select" id="roles">
-                            <li th:each="role : ${roleCollection}" th:value="${role}" th:text="${role.roleName}"></li>
+                    <div  class="card col md-6">
+                        <div  class="card-header  d-block  m-lg-2"><label for="roles" class="form-label m-lg-2 d-flex">Rôles :</label>
+                        <Ol multiple th:field="${roleCollection}" class="form-select m-lg-2 d-block" id="roles">
+                            <li class="m-lg-2" th:each="role : ${roleCollection}" th:value="${role}" th:text="${role.roleName}"></li>
                         </Ol>
+                            <a class="m-lg-2 d-block" th:href="@{AddUserRole?us=}+${userEdit.username}">Editer </a>
                     </div>
 
                     <!-- Submit Button -->
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-primary">Enregistrer</button>
-                    </div>
+                    <div class="col-12 d-flex">
+                        <button type="submit" class="btn btn-primary m-lg-2">Enregistrer</button>
+                        <a class="btn btn-outline-info m-lg-2" th:href="@{/Utilisateurs}">Retour</a>
+                    </div></div>
                 </form>
 
 

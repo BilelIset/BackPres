@@ -164,82 +164,130 @@ public class AdminController {
 
 
     }
+@Autowired
+EmailService emailService;
 
     @GetMapping(path = "/AddUserRole")
-    public String AddUserRole(Model model,@RequestParam(value = "err",defaultValue = "") String err ,@RequestParam(value = "us", defaultValue = "") String us) {
+    public String AddUserRole(Model model,
+                              @RequestParam(value = "adminRole", defaultValue = "false") boolean adminRole,
+                              @RequestParam(value = "key", defaultValue = "") String key,
+                              @RequestParam(value = "err", defaultValue = "") String err,
+                              @RequestParam(value = "us", defaultValue = "") String us,
+                              @RequestParam(value = "del" ,defaultValue = "false")boolean delete) {
+model.addAttribute("delete",delete);
         model.addAttribute("user", findLogged());
+        model.addAttribute("adminRole", adminRole);
+        model.addAttribute("erreur", err.isEmpty() ? "" : "Rôle déjà accordé !");
 
-        String erreur="";
-        model.addAttribute("erreur",erreur);
-
-
-        if (us != null && err.isEmpty()) {
-            AppUser appUser = appUserRepo.findByUsername(us);
-            model.addAttribute("us", us);
-            model.addAttribute("newUser", appUser);
-
-
-            model.addAttribute("roleCollection1", appUser.getRoleCollection()); // Rôles disponibles
-
-
-            model.addAttribute("roleCollection", appRoleRepo.findAll()); // Rôles disponibles
-
-
-        } else if (err!=null|| !err.isEmpty()) {
-            AppUser appUser = appUserRepo.findByUsername(us);
-            model.addAttribute("us", us);
-            model.addAttribute("newUser", appUser);
-
-            erreur="Role déja accordé !";
-            model.addAttribute("roleCollection1", appUser.getRoleCollection()); // Rôles disponibles
-
-
-            model.addAttribute("roleCollection", appRoleRepo.findAll()); // Rôles disponibles
-
-        }
+        AppUser appUser = appUserRepo.findByUsername(us);
+        model.addAttribute("us", us);
+        model.addAttribute("newUser", appUser);
+        model.addAttribute("roleCollection1", appUser.getRoleCollection());
+        model.addAttribute("roleCollection", appRoleRepo.findAll());
 
         return "AddUserRole";
-
     }
+
+
+
     @PostMapping(path = "/AddRoleToUser")
-    public String AddRoleToUser(@RequestParam("us") String us,  @RequestParam (value = "role") String role) {
-        System.out.println("Role recu " +role);
-
-        if( appUserInterface.AddRoleToUser(us, role)){
-            return "redirect:/AddUserRole?us=" + us;}else
-
-        {return "redirect:/AddUserRole?us="+us+"&err=Exist";
-
+    public String addRoleToUser(@RequestParam("us") String us,
+                                @RequestParam(value = "key", defaultValue = "") String key,
+                                @RequestParam("role") String role, HttpSession httpSession,
+                                @RequestParam("delete") boolean delete) {
+        if (delete) {
+            // Redirection vers la suppression du rôle
+            return deleteRoleToUser(us, key, role, httpSession);
         }
 
-    }
-    @PostMapping(path = "/deleteRoleToUser")
-    public String deleteRoleToUser(@RequestParam("us") String us, @RequestParam("role") String role) {
-        System.out.println("Role reçu: " + role);
-        System.out.println("User reçu: " + us);
+        if ("ADMIN".equals(role) && (key == null || key.isEmpty())) {
+            String rand = UUID.randomUUID().toString();
+            httpSession.setAttribute("keyValue", rand);
+           System.out.println(rand);
+         //   AppUser appUser=appUserRepo.findByUsername(findLogged().getUsername());
 
-        if (us != null && !us.isEmpty() && role != null && !role.isEmpty()) {
-            AppUser appUser = appUserRepo.findByUsername(us);
-            System.out.println("Utilisateur trouvé : " + appUser);
-
-            Collection<AppRole> appRoleList = appUser.getRoleCollection();
-            System.out.println("Liste des rôles trouvés : " + appRoleList);
-
-            Iterator<AppRole> iterator = appRoleList.iterator();
-            while (iterator.hasNext()) {
-                AppRole appRole = iterator.next();
-                if (appRole.getRoleName().equals(role)) {
-                    iterator.remove();
-                }
+            AppUser loggedUser = appUserRepo.findByUsername(findLogged().getUsername());
+            if (loggedUser.getRoleCollection().stream().anyMatch(r -> "ADMIN".equals(r.getRoleName()))) {
+              //  emailService.sendSimpleEmail(loggedUser.getEmail(), "Code de vérification", rand);
+                System.out.println(rand);
+                return "redirect:/AddUserRole?us=" + us + "&adminRole=true&del=false";
+            } else {
+                return "redirect:/deconnect";
             }
 
-            appUser.setRoleCollection(appRoleList);
-            appUserRepo.save(appUser);
-            return "redirect:/AddUserRole?us=" + us;
         }
 
-        return "redirect:/AddUserRole?us=" + us + "&err=DeleteFailed";
+        if ("ADMIN".equals(role) && !key.isEmpty()) {
+            String storedKey = (String) httpSession.getAttribute("keyValue");
+            if (storedKey != null && storedKey.equals(key)) {
+                if (appUserInterface.AddRoleToUser(us, role)) {
+                    httpSession.removeAttribute("keyValue");
+                    return "redirect:/AddUserRole?us=" + us + "&del=false";
+                } else {
+                    return "redirect:/AddUserRole?us=" + us + "&err=Exist&del=false";
+                }
+            } else {
+                return "redirect:/AddUserRole?us=" + us + "&adminRole=true&err=VerifyKey&del=false";
+            }
+        }
+
+        if (appUserInterface.AddRoleToUser(us, role)) {
+            return "redirect:/AddUserRole?us=" + us + "&del=false";
+        } else {
+            return "redirect:/AddUserRole?us=" + us + "&err=Exist&del=false";
+        }
     }
+
+    @PostMapping(path = "/deleteRoleToUser")
+    public String deleteRoleToUser(@RequestParam("us") String us,
+                                   @RequestParam(value = "key", defaultValue = "") String key,
+                                   @RequestParam("role") String role, HttpSession httpSession) {
+
+        // Vérification si le rôle est `ADMIN` et si `key` est vide
+        if ("ADMIN".equals(role) && (key == null || key.isEmpty())) {
+            String rand = UUID.randomUUID().toString();
+            System.out.println("Code de vérification généré : " + rand);
+
+            // Enregistrer le code dans la session pour vérification ultérieure
+            httpSession.setAttribute("keyValue", rand);
+
+            // Récupérer l'utilisateur actuellement connecté et envoyer l'email si le rôle `ADMIN` est présent
+            AppUser loggedUser = appUserRepo.findByUsername(findLogged().getUsername());
+            if (loggedUser.getRoleCollection().stream().anyMatch(r -> "ADMIN".equals(r.getRoleName()))) {
+                emailService.sendSimpleEmail(loggedUser.getEmail(), "Code de vérification", rand);
+                return "redirect:/AddUserRole?us=" + us + "&adminRole=true&del=true";
+            } else {
+                return "redirect:/deconnect";
+            }
+        }
+
+        // Vérification si le rôle est `ADMIN` et si `key` est renseigné
+        if ("ADMIN".equals(role) && !key.isEmpty()) {
+            String storedKey = (String) httpSession.getAttribute("keyValue");
+
+            if (storedKey != null && storedKey.equals(key)) {
+                // Suppression du rôle
+                AppUser appUser = appUserRepo.findByUsername(us);
+                appUser.getRoleCollection().removeIf(r -> r.getRoleName().equals(role));
+                appUserRepo.save(appUser);
+
+                // Supprimer le code de vérification de la session après utilisation
+                httpSession.removeAttribute("keyValue");
+
+                return "redirect:/AddUserRole?us=" + us + "&del=true";
+            } else {
+                return "redirect:/AddUserRole?us=" + us + "&adminRole=true&err=VerifyKey&del=true";
+            }
+        }
+
+        // Suppression du rôle pour les rôles autres que `ADMIN`
+        AppUser appUser = appUserRepo.findByUsername(us);
+        appUser.getRoleCollection().removeIf(r -> r.getRoleName().equals(role));
+        appUserRepo.save(appUser);
+
+        return "redirect:/AddUserRole?us=" + us;
+    }
+
 
 
 
@@ -328,15 +376,17 @@ public class AdminController {
             if (newUser != null) {
                 //newUser.setUsername(newUser.getUsername());
 
-                newUser.setAdresse(appUser.getAdresse()); // Peut être null
-                newUser.setAdresse2(appUser.getAdresse2()); // Peut être null
-                newUser.setTelephone1(appUser.getTelephone1()); // Peut être null
-                newUser.setTelephone2(appUser.getTelephone2()); // Peut être null
-                newUser.setTelephone3(appUser.getTelephone3()); // Peut être null
-                newUser.setEmail(appUser.getEmail());
+                appUser.setAdresse(newUser.getAdresse()); // Peut être null
+                appUser.setAdresse2(newUser.getAdresse2()); // Peut être null
+                appUser.setTelephone1(newUser.getTelephone1()); // Peut être null
+                appUser.setTelephone2(newUser.getTelephone2()); // Peut être null
+                appUser.setTelephone3(newUser.getTelephone3()); // Peut être null
+                appUser.setEmail(newUser.getEmail());
+
+
                 // Vous pouvez également conserver les valeurs non modifiées pour les autres champs requis
                 System.out.println("Utilisateur qui va etre enregistré");
-                appUserRepo.save(newUser);
+                appUserRepo.save(appUser);
                 return "redirect:/AddUserRole?us=" + newUser.getUsername();
             } else {
                 return "redirect:/AddUserDetail?us=Erreur parvenu !";
@@ -370,14 +420,14 @@ public class AdminController {
             if(test!=null){
                 test.setNom(appUser.getNom());
                 test.setPrenom(appUser.getPrenom());
-                test.setActif(appUser.isActif());
+              //  test.setActif(appUser.isActif());
                 test.setEmail(appUser.getEmail());
                 test.setTelephone1(appUser.getTelephone1());
                 test.setTelephone2(appUser.getTelephone2());
                 test.setTelephone3(appUser.getTelephone3());
                 test.setAdresse(appUser.getAdresse());
                 test.setAdresse2(appUser.getAdresse2());
-                test.setRoleCollection(appUser.getRoleCollection());
+               // test.setRoleCollection(appUser.getRoleCollection());
             }
         }
         return "redirect:/Utilisateurs";}
@@ -445,31 +495,7 @@ public class AdminController {
 
 
 
-       /* String CURRENT_USER = "";
-        model.addAttribute("user",findLogged());
 
-        try {
-            File uploadDir = new File(UPLOAD_DIR);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-            }
-            String extension = photo.getOriginalFilename().substring(photo.getOriginalFilename().lastIndexOf("."));
-            String errFormat="";
-           if(!extension.equals(".jpg")){
-               errFormat="Format .jpg uniquement";
-               model.addAttribute("errorFormat",errFormat);
-               return "redirect:/Profile ";
-
-           }
-            String newFileName = CURRENT_USER+ extension;
-            Path path = Paths.get(UPLOAD_DIR + newFileName);
-System.out.println(path.toString());
-            Files.write(path, photo.getBytes());
-            findLogged().setPhoto("/uploads/"+newFileName);
-            return "redirect:/Profile ";
-        } catch (IOException ex) {
-            return "Error: " + ex.getMessage();
-        }*/
 
 
 
