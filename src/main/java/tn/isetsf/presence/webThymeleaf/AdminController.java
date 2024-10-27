@@ -396,7 +396,7 @@ public class AdminController {
             AppUser appUser = appUserRepo.findByUsername(us);
             if (appUser.getPhoto() != null && !appUser.getPhoto().isEmpty()) {
                 System.out.println("ancien path de image :"+appUser.getPhoto());
-                File ancienImage = new File("./static/"+appUser.getPhoto());
+                File ancienImage = new File(""+appUser.getPhoto());
                 if (ancienImage.exists()) {
                     boolean deleted = ancienImage.delete();
                     if (!deleted) {
@@ -412,7 +412,7 @@ public class AdminController {
 
             if(appUser!=null){
 
-                File uploadDir = new File("./static/");
+                File uploadDir = new File("");
                 if (!uploadDir.exists()) {
                     uploadDir.mkdirs();
                 }
@@ -425,7 +425,7 @@ public class AdminController {
 
                 }
                 String newFileName = appUser.getUsername()+ LocalDateTime.now().toString().replace(":","_").replace(".","_")+ extension;
-                Path path = Paths.get("./static/" + newFileName);
+                Path path = Paths.get("" + newFileName);
                 System.out.println(path.toString());
                 Files.write(path, photo.getBytes());
                 appUser.setPhoto("/"+newFileName);
