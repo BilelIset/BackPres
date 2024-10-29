@@ -22,6 +22,8 @@ import tn.isetsf.presence.sec.entity.AppUser;
 import tn.isetsf.presence.sec.repository.AppRoleRepo;
 import tn.isetsf.presence.sec.repository.AppUserRepo;
 import tn.isetsf.presence.sec.service.AppUserInterfaceImpl;
+import tn.isetsf.presence.serviceMail.EmailService;
+import tn.isetsf.presence.webThymeleaf.AdminController;
 
 
 import javax.servlet.http.HttpSession;
@@ -59,6 +61,8 @@ public class PresenceApplication {
 		SpringApplication.run(PresenceApplication.class, args);
 	}
 
+@Autowired
+	EmailService emailService;
 
 
 
@@ -100,9 +104,21 @@ public class PresenceApplication {
 //
 //	}
 //
+
+
 	@Bean
 	CommandLineRunner start(AppUserInterfaceImpl appUserInterface) {
 		return args -> {
+//			try{emailService.sendSimpleEmail(
+//					"nissen.masmoudi@gmail.com",
+//					"Mise à jour et correctifs sur votre site",
+//					"Bonjour Mr Nissen,\n\nNous avons récemment apporté des correctifs et ajouté de nouvelles fonctionnalités au site https://www.apirest.tech. Nous vous invitons à visiter le site pour découvrir ces améliorations et nous faire part de vos retours.\n\nCordialement,\nL'équipe technique."
+//			);
+//			System.out.println("Success d'envoie de l'email");
+//			}catch (Exception e){
+//				System.out.println("echec d'envoie de l'email");
+//			}
+
 //			AppUser appUser=appUserRepo.findByUsername("user2");
 //			if(appUser!=null){
 //				appUser.setActif(true);

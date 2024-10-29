@@ -1,33 +1,23 @@
 package tn.isetsf.presence.webThymeleaf;
 
-import org.apache.commons.net.ftp.FTP;
-import org.apache.commons.net.ftp.FTPClient;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.boot.context.properties.bind.DefaultValue;
-import org.springframework.context.annotation.Bean;
-import org.springframework.dao.DataAccessException;
+import org.springframework.context.annotation.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.session.InMemoryWebSessionStore;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 import tn.isetsf.presence.CalculDate;
 import tn.isetsf.presence.Entity.LigneAbsence;
 import tn.isetsf.presence.Repository.EnstRepo;
@@ -46,17 +36,9 @@ import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionEvent;
 import javax.transaction.Transactional;
-import javax.validation.Valid;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.http.HttpRequest;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -65,7 +47,6 @@ import java.util.*;
 
 @Controller
 @Transactional
-@RolesAllowed("ADMIN")
 public class AdminController {
     @Autowired
     LoggedRepo loggedRepo;
@@ -73,7 +54,6 @@ public class AdminController {
     AppRoleRepo appRoleRepo;
     @Autowired
     AppUserInterfaceImpl appUserInterface;
-
 
 
     private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
@@ -88,7 +68,7 @@ public class AdminController {
     private AppUserRepo appUserRepo;
 
 
-    public AdminController(LigneAbsenceRepo ligneAbsenceRepo, EnstRepo enstRepo, SalleRepo salleRepo, ServerStatusService serverStatusService, AppUserRepo appUserRepo ) {
+    public AdminController(LigneAbsenceRepo ligneAbsenceRepo, EnstRepo enstRepo, SalleRepo salleRepo, ServerStatusService serverStatusService, AppUserRepo appUserRepo) {
         this.ligneAbsenceRepo = ligneAbsenceRepo;
         this.enstRepo = enstRepo;
         this.salleRepo = salleRepo;
@@ -96,19 +76,8 @@ public class AdminController {
         this.appUserRepo = appUserRepo;
 
 
-
-
     }
 
-
-
-    @RolesAllowed("ADMIN")
-//    @GetMapping(path = "/forcerDeconnect")
-//    public String forcedDeconnect(Model model,){
-//        System.out.println("Session recu : "+session + "Login recu : "+id);
-//        return " redirect:/login";
-//
-//    }
 
     @GetMapping(path = "/AbsenceEnseignant")
     public String indexModel(Model model,
@@ -124,50 +93,54 @@ public class AdminController {
         model.addAttribute("keyword", keyword);
         model.addAttribute("pathCourant", "/AbsenceEnseignant");
 
-        model.addAttribute("user",findLogged());
-
+        model.addAttribute("user", findLogged());
+        model.addAttribute("isAdmin", isAdmin());
 
 
         return "AbsenceEnseignant"; // Ensure this returns the correct view name
     }
     @GetMapping(path = "/Utilisateurs")
-    public String userControl(Model model){
-        model.addAttribute("user",findLogged());
+    public String userControl(Model model) {
+        model.addAttribute("user", findLogged());
+        model.addAttribute("isAdmin", isAdmin());
 
-        List<AppUser> users=appUserRepo.findAll();
+
+        List<AppUser> users = appUserRepo.findAll();
         System.out.println(users);
-        model.addAttribute("users",users);
+        model.addAttribute("users", users);
         return "Utilisateurs";
     }
+
     @InitBinder
     public void initBinder(WebDataBinder binder) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         dateFormat.setLenient(false);
         binder.registerCustomEditor(LocalDate.class, new CustomDateEditor(dateFormat, true));
     }
+
     @PostMapping(path = "/SaveEssentielUser")
-    public String SaveEssentielUser(Model model,@ModelAttribute("newUser") AppUser appUser){
-        String s="Nom d'utilisateur existant";
+    public String SaveEssentielUser(Model model, @ModelAttribute("newUser") AppUser appUser) {
+        String s = "Nom d'utilisateur existant";
 
         System.out.println(appUser);
-        if(appUser.getUsername()!=null) {
+        if (appUser.getUsername() != null) {
             AppUser appUser1 = appUserRepo.findByUsername(appUser.getUsername());
             if (appUser1 != null) {
-                model.addAttribute("erreur",s);
+                model.addAttribute("erreur", s);
                 return "redirect:/AddUser?us=" + s;
 
-            }}
+            }
+        }
         appUserInterface.AddUser(appUser);
         //appUserRepo.save(appUser);
-        System.out.println("Utilisateur enregistré : "+appUser.getUsername());
-        return "redirect:/AddUserDetail?us="+appUser.getUsername();
-
-
+        System.out.println("Utilisateur enregistré : " + appUser.getUsername());
+        return "redirect:/AddUserDetail?us=" + appUser.getUsername();
 
 
     }
-@Autowired
-EmailService emailService;
+
+    @Autowired
+    EmailService emailService;
 
     @GetMapping(path = "/AddUserRole")
     public String AddUserRole(Model model,
@@ -175,9 +148,11 @@ EmailService emailService;
                               @RequestParam(value = "key", defaultValue = "") String key,
                               @RequestParam(value = "err", defaultValue = "") String err,
                               @RequestParam(value = "us", defaultValue = "") String us,
-                              @RequestParam(value = "del" ,defaultValue = "false")boolean delete) {
-model.addAttribute("delete",delete);
+                              @RequestParam(value = "del", defaultValue = "false") boolean delete) {
+        model.addAttribute("delete", delete);
         model.addAttribute("user", findLogged());
+        model.addAttribute("isAdmin", isAdmin());
+
         model.addAttribute("adminRole", adminRole);
         model.addAttribute("erreur", err.isEmpty() ? "" : "Rôle déjà accordé !");
 
@@ -189,7 +164,6 @@ model.addAttribute("delete",delete);
 
         return "AddUserRole";
     }
-
 
 
     @PostMapping(path = "/AddRoleToUser")
@@ -205,8 +179,8 @@ model.addAttribute("delete",delete);
         if ("ADMIN".equals(role) && (key == null || key.isEmpty())) {
             String rand = UUID.randomUUID().toString();
             httpSession.setAttribute("keyValue", rand);
-           System.out.println(rand);
-         //   AppUser appUser=appUserRepo.findByUsername(findLogged().getUsername());
+            System.out.println(rand);
+            //   AppUser appUser=appUserRepo.findByUsername(findLogged().getUsername());
 
             AppUser loggedUser = appUserRepo.findByUsername(findLogged().getUsername());
             if (loggedUser.getRoleCollection().stream().anyMatch(r -> "ADMIN".equals(r.getRoleName()))) {
@@ -290,23 +264,13 @@ model.addAttribute("delete",delete);
     }
 
 
-
-
-
-
-
-
-
-
-
-
     @PostMapping(path = "/deleteUser")
-    public String deleteUser(@RequestParam(value = "id",defaultValue = "")int id){
-        AppUser appUser=appUserRepo.getById(id);
+    public String deleteUser(@RequestParam(value = "id", defaultValue = "") int id) {
+        AppUser appUser = appUserRepo.getById(id);
 
-        String imageName=appUser.getPhoto();
+        String imageName = appUser.getPhoto();
         // Create a file object for the image to be deleted
-        File file = new File( imageName);
+        File file = new File(imageName);
 
         // Check if the file exists and delete it
         if (file.exists()) {
@@ -314,66 +278,88 @@ model.addAttribute("delete",delete);
         } else {
             System.out.println("File not found: " + imageName);
 
-        }appUserRepo.deleteById(id);
-        System.out.println("Successs delete : "+id);
+        }
+        appUserRepo.deleteById(id);
+        System.out.println("Successs delete : " + id);
         return "redirect:/Utilisateurs";
     }
 
 
     @PostMapping(path = "/lockUnlockUser")
-    public String lockUnlockUser(@RequestParam(value = "id",defaultValue = "")int id){
-        AppUser appUser=appUserRepo.getById(id);
-        if(appUser!=null){
-            if(appUser.isActif()){
+    public String lockUnlockUser(@RequestParam(value = "id", defaultValue = "") int id) {
+        AppUser appUser = appUserRepo.getById(id);
+        if (appUser != null) {
+            if (appUser.isActif()) {
                 appUser.setActif(false);
-            }else appUser.setActif(true);
+            } else appUser.setActif(true);
         }
-        System.out.println("Successs Locking : "+id);
+        System.out.println("Successs Locking : " + id);
         return "redirect:/Utilisateurs";
     }
+
     @GetMapping(path = "/EditUser")
-    public String EditUser(Model model,@RequestParam(value = "id",defaultValue = "")int id){
-        model.addAttribute("user",findLogged());
-        AppUser appUser=appUserRepo.getById(id);
-        if(appUser!=null){
-            model.addAttribute("userEdit",appUser);
-            model.addAttribute("roleCollection",appUser.getRoleCollection());
+    public String EditUser(Model model, @RequestParam(value = "id", defaultValue = "") int id) {
+        model.addAttribute("user", findLogged());
+        model.addAttribute("isAdmin", isAdmin());
+
+        AppUser appUser = appUserRepo.getById(id);
+        if (appUser != null) {
+            model.addAttribute("userEdit", appUser);
+            model.addAttribute("roleCollection", appUser.getRoleCollection());
         }
 
         return "EditUser";
     }
 
-    public AppUser findLogged(){
-        Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
-        if (authentication!=null){
-            String utilisateur=((UserDetails)authentication.getPrincipal()).getUsername();
-            AppUser appUser1=appUserRepo.findByUsername(utilisateur);
+    public AppUser findLogged() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            boolean isAdmin = false;
+
+            String utilisateur = ((UserDetails) authentication.getPrincipal()).getUsername();
+
+
+            AppUser appUser1 = appUserRepo.findByUsername(utilisateur);
+
             return appUser1;
 
-        }else return null;
+        } else return null;
+    }
+
+    public boolean isAdmin() {
+        System.out.println("Liste des role dans isAdmin = " + findLogged().getRoleCollection());
+        for (AppRole appRole : findLogged().getRoleCollection()) {
+
+            if (appRole.getRoleName().equals("ADMIN")) {
+                System.out.println("Role trouvé dans la nouvelle methode isAdmin");
+                return true;
+            }
+        }
+        return false;
     }
 
     @GetMapping(path = "/AddUserDetail")
-    public String AddUserDetail(Model model,@RequestParam(value = "us", defaultValue = "") String us ){
+    public String AddUserDetail(Model model, @RequestParam(value = "us", defaultValue = "") String us) {
 
-        model.addAttribute("user",findLogged());
-        model.addAttribute("us",us);
-        System.out.println("Path recur user details : "+us);
-        model.addAttribute("newUser",new AppUser());
+        model.addAttribute("user", findLogged());
+        model.addAttribute("isAdmin", isAdmin());
+        model.addAttribute("us", us);
+        System.out.println("Path recur user details : " + us);
+        model.addAttribute("newUser", new AppUser());
         return "AddUserDetail";
-
 
 
     }
 
     @Autowired
     private FtpService ftpService;
+
     @PostMapping(path = "/saveUserDetail")
-    public String SaveUserDetail( @RequestParam(value = "us", defaultValue = "") String us, @ModelAttribute(value = "newUser") AppUser appUser) {
-        System.out.println("path recu sur details poste   : " +us);
+    public String SaveUserDetail(@RequestParam(value = "us", defaultValue = "") String us, @ModelAttribute(value = "newUser") AppUser appUser) {
+        System.out.println("path recu sur details poste   : " + us);
         if (us != null) {
             AppUser newUser = appUserRepo.findByUsername(us);
-            System.out.println("Utilistaeur trouvé : "+newUser);
+            System.out.println("Utilistaeur trouvé : " + newUser);
             if (newUser != null) {
                 //newUser.setUsername(newUser.getUsername());
 
@@ -383,6 +369,7 @@ model.addAttribute("delete",delete);
                 newUser.setTelephone2(appUser.getTelephone2()); // Peut être null
                 newUser.setTelephone3(appUser.getTelephone3()); // Peut être null
                 newUser.setEmail(appUser.getEmail());
+                newUser.setActif(appUser.isActif());
 
 
                 // Vous pouvez également conserver les valeurs non modifiées pour les autres champs requis
@@ -390,7 +377,7 @@ model.addAttribute("delete",delete);
                 appUserRepo.save(newUser);
                 return "redirect:/AddUserRole?us=" + newUser.getUsername();
             } else {
-                if(appUser!=null)appUserRepo.save(appUser);
+                if (appUser != null) appUserRepo.save(appUser);
                 return "redirect:/AddUserDetail?us=Erreur parvenu !";
             }
         } else {
@@ -400,59 +387,76 @@ model.addAttribute("delete",delete);
 
 
     @GetMapping(path = "/AddUser")
-    public String addUser(Model model,@RequestParam(value = "us", defaultValue = "") String us ){
-        model.addAttribute("user",findLogged());
+    public String addUser(Model model, @RequestParam(value = "us", defaultValue = "") String us) {
+        model.addAttribute("user", findLogged());
+        model.addAttribute("isAdmin", isAdmin());
 
-        if (us!=""){
-            model.addAttribute("erreur",us);
 
-            model.addAttribute("newUser",new AppUser());
-            List<AppRole>  list=appRoleRepo.findAll();
-            List< AppRole> appRole=new ArrayList<>();
-            model.addAttribute("rappRole",appRole);
-            model.addAttribute("roleCollection",list);
+        if (us != "") {
+            model.addAttribute("erreur", us);
 
-        }        return "AddUser";
+            model.addAttribute("newUser", new AppUser());
+            List<AppRole> list = appRoleRepo.findAll();
+            List<AppRole> appRole = new ArrayList<>();
+            model.addAttribute("rappRole", appRole);
+            model.addAttribute("roleCollection", list);
+
+        }
+        return "AddUser";
 
     }
+
     @PostMapping("/saveUser")
-    public String uploadImage(Model model,@ModelAttribute(value = "newUser" )AppUser appUser) {
-        System.out.println("User received "+appUser);
-        if(appUser!=null){
-            AppUser test=appUserRepo.findByUsername(appUser.getUsername());
-            System.out.println("user find in base :"+test);
-            if(test!=null){
+    public String uploadImage(Model model, @ModelAttribute(value = "newUser") AppUser appUser) {
+        System.out.println("User received " + appUser);
+        if (appUser != null) {
+            AppUser test = appUserRepo.findByUsername(appUser.getUsername());
+            System.out.println("user find in base :" + test);
+            if (test != null) {
                 test.setNom(appUser.getNom());
                 test.setPrenom(appUser.getPrenom());
-              //  test.setActif(appUser.isActif());
+                //  test.setActif(appUser.isActif());
                 test.setEmail(appUser.getEmail());
                 test.setTelephone1(appUser.getTelephone1());
                 test.setTelephone2(appUser.getTelephone2());
                 test.setTelephone3(appUser.getTelephone3());
                 test.setAdresse(appUser.getAdresse());
                 test.setAdresse2(appUser.getAdresse2());
-               // test.setRoleCollection(appUser.getRoleCollection());
-                System.out.println("Saved User"+test);
+                // test.setRoleCollection(appUser.getRoleCollection());
+                System.out.println("Saved User" + test);
                 appUserRepo.save(test);
-            }
-            else {
+            } else {
                 appUserRepo.save(appUser);
             }
         }
-        return "redirect:/Utilisateurs";}
+        Collection<AppRole> list=findLogged().getRoleCollection();
+        for (AppRole appRole:list){
+            if (appRole.getRoleName().equals("ENSEIGNANT")){
+                return "redirect:/EspaceEnseignant";
+
+            }
+        }
+            return "redirect:/Utilisateurs";
+
+
+    }
+
     @GetMapping(path = "/AddUserPhoto")
-    public String AddUserPhoto(Model model ,@RequestParam(value = "us",defaultValue = "")String us){
-        model.addAttribute("user",findLogged());
-        if(us!=null){
-            AppUser appUser=appUserRepo.findByUsername(us);
-            if(appUser!=null){
-                model.addAttribute("newUser",appUser);
+    public String AddUserPhoto(Model model, @RequestParam(value = "errFormat",defaultValue = "")String errorFormat,@RequestParam(value = "us", defaultValue = "") String us) {
+        model.addAttribute("user", findLogged());
+        model.addAttribute("isAdmin", isAdmin());
+        model.addAttribute("errFormat", errorFormat);
+        if (us != null) {
+            AppUser appUser = appUserRepo.findByUsername(us);
+            if (appUser != null) {
+                model.addAttribute("newUser", appUser);
                 System.out.println(appUser.getPhoto());
             }
         }
 
         return "AddUserPhoto";
     }
+
     private final String uploadsDirectory = "https://www.apirest.tech/downloads/uploads/"; // Répertoire sur le serveur FTP
 
     @PostMapping(path = "/AddUserImg")
@@ -461,31 +465,34 @@ model.addAttribute("delete",delete);
 
         if (us != null) {
             AppUser appUser = appUserRepo.findByUsername(us);
+            System.out.println("Taille de l'image recu :"+photo.getSize());
 
             // Vérifiez si l'utilisateur existe
             if (appUser != null) {
                 // Si l'utilisateur a déjà une photo, supprimez-la du serveur FTP
+                if(photo.getSize()>200000){
+                    return "redirect:/AddUserPhoto?us="+us+"&errFormat="+"Taille invalide :taille max de l'image = 200 KB!";
+
+                }
+
+                // Vérifiez le format du fichier
+                String extension = photo.getOriginalFilename().substring(photo.getOriginalFilename().lastIndexOf("."));
+
+                if (!extension.equalsIgnoreCase(".jpg")) {
+
+                    return "redirect:/AddUserPhoto?us="+us+"&errFormat="+"Format d'image invalide :format JPG uniquement !";
+                }
+
+                // Créez un nom de fichier unique pour le téléversement
+                String newFileName = appUser.getUsername() + LocalDateTime.now().toString().replace(":", "_").replace(".", "_") + extension;
                 if (appUser.getPhoto() != null && !appUser.getPhoto().isEmpty()) {
                     System.out.println("Ancien path de l'image :" + appUser.getPhoto());
 
                     // Extraire le nom de fichier pour la suppression
                     String oldFileName = appUser.getPhoto().substring(appUser.getPhoto().lastIndexOf("/") + 1);
-                    System.out.println("Path de suppression"+oldFileName);
+                    System.out.println("Path de suppression" + oldFileName);
                     ftpService.deleteFile(oldFileName); // Méthode pour supprimer le fichier du serveur FTP
                 }
-
-                // Vérifiez le format du fichier
-                String extension = photo.getOriginalFilename().substring(photo.getOriginalFilename().lastIndexOf("."));
-                String errFormat = "";
-                if (!extension.equalsIgnoreCase(".jpg")) {
-                    errFormat = "Format .jpg uniquement";
-                    model.addAttribute("errorFormat", errFormat);
-                    return "redirect:/AddUserPhoto";
-                }
-
-                // Créez un nom de fichier unique pour le téléversement
-                String newFileName = appUser.getUsername() + LocalDateTime.now().toString().replace(":", "_").replace(".", "_") + extension;
-
                 // Téléversez le fichier sur le serveur FTP
                 ftpService.uploadFile(photo, newFileName); // Méthode pour téléverser le fichier
 
@@ -500,49 +507,80 @@ model.addAttribute("delete",delete);
         return "redirect:/AddUserPhoto?us=" + us;
     }
 
+    @GetMapping("/CheckPoint")
+    public String CheckPoint(Model model, @RequestParam(value = "id") int id) {
+        AppUser appUser = appUserRepo.getById(id);
+        VerfPas verfPas = new VerfPas();
+        verfPas.setId(id);
+        verfPas.setAncienPass("");
+        verfPas.setNouveauPass("");
+
+        model.addAttribute("userEdit", verfPas);
+        model.addAttribute("user", findLogged());
+        model.addAttribute("isAdmin", isAdmin());
+        model.addAttribute("test", "Hello check");
+
+        return "CheckPoint";
+    }
+
+    @PostMapping("/CheckCred")
+    public String CheckCred(@ModelAttribute("userEdit") VerfPas verfPas, Model model) {
+        System.out.println("NewUser RECU :" + verfPas);
+        System.out.println("MDP RECU :" + verfPas.getAncienPass());
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        AppUser appUser = appUserRepo.getById(verfPas.getId());
+        System.out.println("Utilisateur trouvé : " + appUser);
+
+        if (!encoder.matches(verfPas.getAncienPass(), appUser.getPassword())) {
+            System.out.println("Mot de Passe Non Conforme");
+            model.addAttribute("error", "Mot de passe actuel incorrect.");
+            return "redirect:/CheckPoint?id="+verfPas.id; // renvoie à la page avec un message d'erreur
+        } else {
+            System.out.println("Mot de passe identique");
+appUser.setPassword(encoder.encode(verfPas.nouveauPass));
+appUserRepo.save(appUser);
+            return "redirect:/EditUser?id="+verfPas.getId();
+
+        }
 
 
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+@Data
+class VerfPas{
+        private int id;
+      private String ancienPass;
+      private String nouveauPass;
+}
 
     @GetMapping("/Profile")
-    public String profile(Model model,HttpServletRequest request,HttpServletResponse response) {
+    public String profile(Model model, HttpServletRequest request, HttpServletResponse response) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String utilisateur = "";
 
-        model.addAttribute("user",findLogged());
+        model.addAttribute("user", findLogged());
+        model.addAttribute("isAdmin", isAdmin());
+
 
         return "Profile"; // Your Thymeleaf template name
     }
 
 
 
-    @RolesAllowed("ADMIN")
-
     @GetMapping(path = "/AbsenceEtudiant")
     public String etudiantPage(Model model) {
         model.addAttribute("pathCourant", "/AbsenceEtudiant");
         //String utilisateurCourant = "";
-        model.addAttribute("user",findLogged());
-        String utilisateur = "";
+        model.addAttribute("user", findLogged());
+        model.addAttribute("isAdmin", isAdmin());
 
+        String utilisateur = "";
 
 
         return "AbsenceEtudiant"; // Ensure this returns the correct view name
     }
-    @RolesAllowed("ADMIN")
+
 
     @GetMapping(path = "/Dashboard")
     public String dashboardModel(Model model,
@@ -551,13 +589,15 @@ model.addAttribute("delete",delete);
                                  @RequestParam(value = "keyword", defaultValue = "") String keyword) throws IOException {
         String utilisateur = "";
 
-        model.addAttribute("user",findLogged());
+        model.addAttribute("user", findLogged());
+        model.addAttribute("isAdmin", isAdmin());
 
-        List<Logged> loggedList=loggedRepo.findByConnectedTrue();
-        System.out.println("Utilisateur trouvé a la connection"+loggedList);
-        System.out.println("Utilisateur trouvé apres l'erreur"+loggedList);
+
+        List<Logged> loggedList = loggedRepo.findByConnectedTrue();
+        System.out.println("Utilisateur trouvé a la connection" + loggedList);
+        System.out.println("Utilisateur trouvé apres l'erreur" + loggedList);
         System.out.println(loggedList);
-        model.addAttribute("loggedList",loggedList);
+        model.addAttribute("loggedList", loggedList);
         int notifiedCount = 0;
         Page<LigneAbsence> absencePage = ligneAbsenceRepo.findByEnsi1Contains(keyword, PageRequest.of(page, size));
 
@@ -568,13 +608,13 @@ model.addAttribute("delete",delete);
         }
 
         boolean mobileServer = serverStatusService.checkMobileAppServerStatus("https://www.apirest.tech/emploi/all");
-        System.out.println("Mobile "+mobileServer);
-        boolean mailServer=true;// = serverStatusService.checkMailServer();
-        System.out.println("Mail "+mailServer);
+        System.out.println("Mobile " + mobileServer);
+        boolean mailServer = true;// = serverStatusService.checkMailServer();
+        System.out.println("Mail " + mailServer);
         boolean webServer = serverStatusService.checkMobileAppServerStatus("https://www.apirest.tech/");
-        System.out.println("Web "+webServer);
+        System.out.println("Web " + webServer);
         boolean statusGeneral = mailServer && mobileServer && webServer;
-        System.out.println("Générale  "+statusGeneral);
+        System.out.println("Générale  " + statusGeneral);
 
         model.addAttribute("statusGeneral", statusGeneral);
         model.addAttribute("webServer", webServer);
@@ -591,9 +631,8 @@ model.addAttribute("delete",delete);
         String fullDate = calculDate.JourEnTouteLettre() + "  " + dateNow;
 
         List<LigneAbsence> listNonNotified = ligneAbsenceRepo.findByNotifiedFalse();
-        List<LigneAbsence> listNonNotifier=new ArrayList<>();
-        for (int i=0;i<5;i++)
-        {
+        List<LigneAbsence> listNonNotifier = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
             listNonNotifier.add(listNonNotified.get(i));
         }
         model.addAttribute("listNonNotifier", listNonNotifier);
@@ -613,18 +652,18 @@ model.addAttribute("delete",delete);
 
         return "Dashboard"; // Ensure this returns the correct view name
     }
+
     @GetMapping("/api/absences")
     @ResponseBody
     public List<Object[]> getAbsencesByEnseignant() {
         List<Object[]> objectList = ligneAbsenceRepo.countAbsencesByEnseignantNative();
-        List<Object[]> objects=new ArrayList<>();
-        for (int i=0;i<5;i++){
+        List<Object[]> objects = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
             objects.add(objectList.get(i));
         }
 
 
-
-
         return objects;
 
-    }}
+    }
+}

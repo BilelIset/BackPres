@@ -19,7 +19,9 @@
 <body>
 <div layout:fragment="content1" class="container my-2">
     <div><h1 th:text="${newUser.username}"></h1>
-    <img style="height:200px;width:200px" th:src="${newUser.photo}"></div>
+    <img style="height:200px;width:200px" th:src="${newUser.photo}"><h3 class="text-danger" th:text="${errFormat}"></h3>
+        <h3 th:text="${success}"></h3>
+    </div>
     <div>
 <form th:action="@{/AddUserImg?us=}+${newUser.username}" th:object="${newUser}" method="post" enctype="multipart/form-data" class="row g-3">
         <div class="col-md-6">
@@ -31,8 +33,6 @@
             <a class="btn btn-success m-lg-2" th:href="@{/EditUser}+'?id='+${newUser.id}">Terminé</a>
         </div>
     </form>
-<h3 th:text="${errorFormat}"></h3>
-    <h3 th:text="${success}"></h3>
 
 
 </div></div>

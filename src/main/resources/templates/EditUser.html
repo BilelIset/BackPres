@@ -25,6 +25,7 @@
                     <div class="col-md-6">
                         <label for="username" class="form-label">Nom d'utilisateur</label>
                         <input readonly type="text" th:field="${userEdit.username}" class="form-control" id="username" placeholder="Nom d'utilisateur" required>
+                 <br>  <a th:href="@{/CheckPoint?id=}+${userEdit.id}">Changer Mot De Passe</a>
                     </div>
                     <div class="col-md-6 card" style="display:flex">
 <div style="display:inline-flex" class="card-body">
@@ -108,7 +109,13 @@
                         <input type="text" th:field="${userEdit.telephone3}" class="form-control" id="telephone3" placeholder="Téléphone supplémentaire">
                     </div>
 
-
+                    <div th:class="${isAdmin}?'col-md-6':'d-none'">
+                        <label for="actif" class="form-label">Actif</label>
+                        <select th:field="${userEdit.actif}" class="form-select" id="actif">
+                            <option value="true">Oui</option>
+                            <option value="false">Non</option>
+                        </select>
+                    </div>
 
 
 
@@ -121,13 +128,13 @@
                         <Ol multiple th:field="${roleCollection}" class="form-select m-lg-2 d-block" id="roles">
                             <li class="m-lg-2" th:each="role : ${roleCollection}" th:value="${role}" th:text="${role.roleName}"></li>
                         </Ol>
-                            <a class="m-lg-2 d-block" th:href="@{AddUserRole?us=}+${userEdit.username}">Editer </a>
+                            <a th:class="${isAdmin}?'m-lg-2 d-block':'d-none'" th:href="@{AddUserRole?us=}+${userEdit.username}">Editer </a>
                     </div>
 
                     <!-- Submit Button -->
                     <div class="col-12 d-flex">
                         <button type="submit" class="btn btn-primary m-lg-2">Enregistrer</button>
-                        <a class="btn btn-outline-info m-lg-2" th:href="@{/Utilisateurs}">Retour</a>
+                        <a th:class="${isAdmin}?'btn btn-outline-info m-lg-2':'d-none'" th:href="@{/Utilisateurs}">Retour</a>
                     </div></div>
                 </form>
 

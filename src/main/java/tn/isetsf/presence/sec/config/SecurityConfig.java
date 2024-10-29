@@ -43,29 +43,19 @@ auth.userDetailsService(new UserDetailsService() {
     }
 });
     }
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
-
         http.formLogin().loginPage("/login").defaultSuccessUrl("/default", true);
-
-
         http
                 .authorizeRequests()
-                .antMatchers("/login","/webjars/jquery/3.6.0/jquery.min.js","/static/chart.js","/deconnect", "/webjars/bootstrap/5.3.3/css/bootstrap.min.css",
-                        "/webjars/bootstrap-icons/1.10.5/font/bootstrap-icons.css",
-                        "/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js", "/logo.png",
-                        "/error")
-                .permitAll()
-                .antMatchers("/AbsenceEnseignant", "https://www.apirest.tech/downloads/**","/AbsenceEtudiant", "/Dashboard","/actuator/**")
-                .hasRole("ADMIN").antMatchers("/EspaceEnseignant").hasRole("ENSEIGNANT") // Remplacez "YOUR_ROLE" par le rôle approprié
-                .anyRequest()
-                .authenticated()
+                .antMatchers("/login", "https://www.apirest.tech/downloads/**","/default", "/webjars/**", "/smiley.png","/logo.png","/deconnect", "/error").permitAll() // Accès libre
+                .antMatchers("/EspaceEnseignant","/AddUserPhoto","/CheckCred","/CheckPoint","/AddUserImg","/AbsenceEtudiant","/saveUser","/EditUser").hasRole("ENSEIGNANT") // ENSEIGNANT pour une page spécifique
+                .antMatchers("/**").hasRole("ADMIN") // ADMIN peut accéder à tout
+
+                .anyRequest().authenticated() // Autres requêtes nécessitant authentification
                 .and()
                 .sessionManagement().maximumSessions(1);
-
-        // Accessible à tout le monde
     }
+
 
 }

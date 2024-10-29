@@ -83,10 +83,10 @@
     <div class="offcanvas-body">
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link text-light" href="/Dashboard"><i style="margin-right:5px" class="bi bi-speedometer"></i>Dashboard</a>
+                <a th:class="${isAdmin}?'nav-link text-light':'d-none'" href="/Dashboard"><i style="margin-right:5px" class="bi bi-speedometer"></i>Dashboard</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-light" href="/Utilisateurs"><i style="margin-right:5px" class="bi bi-people-fill"></i>Utilisateurs</a>
+                <a th:class="${isAdmin}?'nav-link text-light':'d-none'" href="/Utilisateurs"><i style="margin-right:5px" class="bi bi-people-fill"></i>Utilisateurs</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link text-light" style="cursor: pointer;" onclick="toggleMenu()"><i style="margin-right:5px" class="bi bi-bookmark-x"></i>Absence</a>
@@ -95,7 +95,7 @@
             <div id="dropMenu" class="container" style="display:none;">
                 <ul class="nav flex-column ms-2">
                     <li class="nav-item">
-                        <a th:attr="style=(${pathCourant}=='/AbsenceEnseignant' ? 'color:grey;' : 'color:white;')" class="nav-link" href="/AbsenceEnseignant">
+                        <a th:attr="style=(${pathCourant}=='/AbsenceEnseignant' ? 'color:grey;' : 'color:white;')" th:class="${isAdmin}?'nav-link ':'d-none'" href="/AbsenceEnseignant">
                             <i style="margin-right:5px" class="bi bi-person-video3"></i> Enseignants
                         </a>
                     </li>

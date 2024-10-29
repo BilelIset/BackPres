@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="template">
+<head>
+    <meta charset="UTF-8">
+    <title>Check Point</title>
+    <link rel="stylesheet" href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css">
+    <script src="/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<div layout:fragment="content1" class="container my-2">
+    <div class="col-md-4">
+        <form th:action="@{/CheckCred}" th:object="${userEdit}" method="post" onsubmit="return checkPasswords();">
+            <div>
+                <input type="hidden" th:field="*{id}">
+                <div class="mb-3">
+                    <input placeholder="Mot De Passe Actuel" th:field="*{ancienPass}" type="password" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <input placeholder="Nouveau Mot de Passe" th:field="*{nouveauPass}" id="nouv" type="password" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <input placeholder="Confirmer le Nouveau Mot de Passe" id="conf" type="password" class="form-control">
+                </div>
+            </div>
+
+            <div>
+                <button type="submit" class="btn btn-primary">Check</button>
+            </div>
+        </form>
+
+        <div th:if="${error}" class="alert alert-danger mt-3" th:text="${error}"></div>
+    </div>
+</div>
+
+<script>
+    function checkPasswords() {
+        const nouv = document.getElementById("nouv").value;
+        const conf = document.getElementById("conf").value;
+
+        if (nouv !== conf) {
+            alert("Les mots de passe ne correspondent pas.");
+            return false; // Empêche l'envoi du formulaire si les mots de passe sont différents
+        }
+        return true;
+    }
+</script>
+
+</body>
+</html>

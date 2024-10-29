@@ -94,11 +94,12 @@ public class DefaultController {
             }
         }
 
+
         if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
             return "redirect:/Dashboard";
         } else if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ENSEIGNANT"))) {
             return "redirect:/EspaceEnseignant";
         }
         return "redirect:/";
-    }
-}
+
+    }}
