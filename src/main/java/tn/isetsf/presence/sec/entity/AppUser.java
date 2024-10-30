@@ -13,6 +13,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -44,6 +45,8 @@ public class AppUser {
     private Integer telephone2=0;
     private Integer telephone3=0;
     private boolean actif=true;
+    private String resetToken="";
+    private LocalDateTime expiration;
 
     private String photo="";
 

@@ -27,6 +27,8 @@ import tn.isetsf.presence.webThymeleaf.AdminController;
 
 
 import javax.servlet.http.HttpSession;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -109,10 +111,14 @@ public class PresenceApplication {
 	@Bean
 	CommandLineRunner start(AppUserInterfaceImpl appUserInterface) {
 		return args -> {
+			String tok2=UUID.randomUUID().toString().replace("-","#_è");
+			String tok=tok2+UUID.randomUUID().toString().replace("-","&éàè");
+			URLEncoder.encode(tok, StandardCharsets.UTF_8);
+			System.out.println("random généré : "+tok);
 //			try{emailService.sendSimpleEmail(
-//					"nissen.masmoudi@gmail.com",
+//					"bilelbenabdallah31@gmail.com",
 //					"Mise à jour et correctifs sur votre site",
-//					"Bonjour Mr Nissen,\n\nNous avons récemment apporté des correctifs et ajouté de nouvelles fonctionnalités au site https://www.apirest.tech. Nous vous invitons à visiter le site pour découvrir ces améliorations et nous faire part de vos retours.\n\nCordialement,\nL'équipe technique."
+//					"Bonjour Mr Nissen,\n\nNous avons récemment apporté des correctifs et ajouté de nouvelles fonctionnalités au site https://www.apirest.tech. Nous vous invitons à visiter le site avec vos  paramètres crédentiels pour découvrir ces améliorations et nous faire part de vos retours et on vous invite à accéder aussi avec le role ENSEIGNANT login=user23 avec mdp=12345.\n\nCordialement,\nL'équipe technique."
 //			);
 //			System.out.println("Success d'envoie de l'email");
 //			}catch (Exception e){

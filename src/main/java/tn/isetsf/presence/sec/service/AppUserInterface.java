@@ -11,5 +11,6 @@ public interface AppUserInterface {
     boolean AddRoleToUser(String userName, String roleName);
     AppUser LoadUserByUserName(String userName);
     List<AppUser> ListUser();
+    AppUser findByEmail(String email);
 
 }

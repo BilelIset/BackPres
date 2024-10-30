@@ -5,4 +5,6 @@ import tn.isetsf.presence.sec.entity.AppUser;
 
 public interface AppUserRepo extends JpaRepository<AppUser,Integer> {
     AppUser findByUsername(String userName);
+    AppUser findByEmail(String email);
+    AppUser findByResetToken(String token);
 }

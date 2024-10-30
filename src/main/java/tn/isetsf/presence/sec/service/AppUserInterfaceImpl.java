@@ -34,6 +34,17 @@ public class AppUserInterfaceImpl implements AppUserInterface {
         appUser.setPassword(passwordEncoder.encode(pass));
         return appUserRepo.save(appUser);
     }
+    public boolean SaveUser(AppUser appUser){
+       try {
+           appUserRepo.save(appUser);
+           return true;
+       }catch (Exception e){
+           return false;
+       }
+    }
+    public AppUser FindByToken(String token){
+        return appUserRepo.findByResetToken(token);
+    }
 
     @Override
     public boolean AddRoleToUser(String userName, String roleName) {
@@ -58,5 +69,11 @@ public class AppUserInterfaceImpl implements AppUserInterface {
     @Override
     public List<AppUser> ListUser() {
         return appUserRepo.findAll();
+    }
+
+    @Override
+    public AppUser findByEmail(String email) {
+      return   appUserRepo.findByEmail(email);
+
     }
 }

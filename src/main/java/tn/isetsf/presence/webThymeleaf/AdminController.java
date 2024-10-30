@@ -463,6 +463,7 @@ public class AdminController {
     public String addUserImg(Model model, @RequestParam String us, @RequestParam("photo") MultipartFile photo) throws IOException {
         System.out.println("Received " + us);
 
+
         if (us != null) {
             AppUser appUser = appUserRepo.findByUsername(us);
             System.out.println("Taille de l'image recu :"+photo.getSize());
@@ -508,7 +509,36 @@ public class AdminController {
     }
 
     @GetMapping("/CheckPoint")
-    public String CheckPoint(Model model, @RequestParam(value = "id") int id) {
+    public String CheckPoint(Model model, @RequestParam(value = "id") int id,
+                             @RequestParam(value = "error", defaultValue = "") String error,
+                             @RequestParam(value = "conf", defaultValue = "") String conf,
+                             HttpSession httpSession) {
+        // Vérification de la présence d'un code de confirmation
+        if (!conf.equals("") ) {
+            String sessionConfCode = (String) httpSession.getAttribute("confcode");
+
+          //  if (sessionConfCode != null && sessionConfCode.equals(conf)) {
+                model.addAttribute("error", error);
+             //   AppUser appUser = appUserRepo.getById(id);
+                VerfPas verfPas = new VerfPas();
+                verfPas.setId(id);
+                verfPas.setAncienPass("");
+                verfPas.setNouveauPass("");
+
+                model.addAttribute("userEdit", verfPas);
+                model.addAttribute("user", findLogged());
+                model.addAttribute("isAdmin", isAdmin());
+                model.addAttribute("test", "Hello check");
+                // Rediriger vers CheckPoint si le code est correct
+                return "redirect:/CheckPoint?id="+verfPas.getId();
+//            } else {
+//                // Rediriger vers déconnexion si le code est incorrect
+//                return "redirect:/deconnect";
+//            }
+        }
+
+        // Ajouter les attributs au modèle
+        model.addAttribute("error", error);
         AppUser appUser = appUserRepo.getById(id);
         VerfPas verfPas = new VerfPas();
         verfPas.setId(id);
@@ -520,11 +550,14 @@ public class AdminController {
         model.addAttribute("isAdmin", isAdmin());
         model.addAttribute("test", "Hello check");
 
-        return "CheckPoint";
+        return "CheckPoint"; // Retourner la vue CheckPoint
     }
 
+    int i = 1;
+
     @PostMapping("/CheckCred")
-    public String CheckCred(@ModelAttribute("userEdit") VerfPas verfPas, Model model) {
+    public String CheckCred(@ModelAttribute("userEdit") VerfPas verfPas,
+                            Model model, HttpSession httpSession) {
         System.out.println("NewUser RECU :" + verfPas);
         System.out.println("MDP RECU :" + verfPas.getAncienPass());
 
@@ -532,26 +565,41 @@ public class AdminController {
         AppUser appUser = appUserRepo.getById(verfPas.getId());
         System.out.println("Utilisateur trouvé : " + appUser);
 
+        // Vérification du mot de passe
         if (!encoder.matches(verfPas.getAncienPass(), appUser.getPassword())) {
             System.out.println("Mot de Passe Non Conforme");
-            model.addAttribute("error", "Mot de passe actuel incorrect.");
-            return "redirect:/CheckPoint?id="+verfPas.id; // renvoie à la page avec un message d'erreur
+            httpSession.setAttribute("tentative", i++);
+            System.out.println("Nombre d'essai = " + httpSession.getAttribute("tentative"));
+
+            if (Integer.parseInt(httpSession.getAttribute("tentative").toString()) > 0) {
+                String ranf = UUID.randomUUID().toString().replace("-","");
+                emailService.sendSimpleEmail("bilelbenabdallah31@gmail.com",
+                        "Tentative de changement de mot de passe",
+                        "Une tentative de changement de votre mot de passe actuelle est détectée. " +
+                                "Si vous êtes à l'origine de cette action, veuillez suivre le lien suivant : " +
+                                "http://localhost:8085/CheckPoint?id=" + findLogged().getId() + "&conf=" + ranf +
+                                " et changer votre mot de passe actuel. Si vous n'êtes pas à l'origine de cette action, " +
+                                "votre compte sera désactivé temporairement pour des raisons de sécurité. " +
+                                "Veuillez contacter l'administrateur du site.");
+                httpSession.setAttribute("confcode", ranf);
+                httpSession.setAttribute("tentative", 1);
+            }
+
+            return "redirect:/CheckPoint?id=" + verfPas.getId() + "&error=Mot de passe actuel incorrect."; // redirige avec un message d'erreur
         } else {
             System.out.println("Mot de passe identique");
-appUser.setPassword(encoder.encode(verfPas.nouveauPass));
-appUserRepo.save(appUser);
-            return "redirect:/EditUser?id="+verfPas.getId();
-
+            appUser.setPassword(encoder.encode(verfPas.getNouveauPass()));
+            appUserRepo.save(appUser);
+            return "redirect:/EditUser?id=" + verfPas.getId(); // redirige vers la page d'édition de l'utilisateur
         }
-
-
     }
 
-@Data
+    @Data
 class VerfPas{
         private int id;
       private String ancienPass;
       private String nouveauPass;
+
 }
 
     @GetMapping("/Profile")
