@@ -58,7 +58,7 @@ public class Forgot {
                 appUser.setExpiration(LocalDateTime.now().plusMinutes(15));
                 appUserInterface.SaveUser(appUser);
                 String subject = "Réinitialisation de votre mot de passe";
-                String resetUrl = "http://localhost:8085/reset-password?token=" + tok;
+                String resetUrl = "https://www.apirest.tech/reset-password?token=" + tok;
                 String message = "Veuillez cliquer sur le lien suivant pour réinitialiser votre mot de passe : " + resetUrl;
 
                 // Utilisez votre service d'envoi d'e-mails ici
