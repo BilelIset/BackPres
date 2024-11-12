@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.session.InMemoryWebSessionStore;
+import tn.isetsf.presence.Repository.LigneAbsenceRepo;
 import tn.isetsf.presence.sec.entity.AppRole;
 import tn.isetsf.presence.sec.entity.AppUser;
 import tn.isetsf.presence.sec.repository.AppRoleRepo;
@@ -107,14 +108,17 @@ public class PresenceApplication {
 //	}
 //
 
-
+@Autowired
+	LigneAbsenceRepo ligneAbsenceRepo;
 	@Bean
 	CommandLineRunner start(AppUserInterfaceImpl appUserInterface) {
 		return args -> {
-			String tok2=UUID.randomUUID().toString().replace("-","#_è");
-			String tok=tok2+UUID.randomUUID().toString().replace("-","&éàè");
-			URLEncoder.encode(tok, StandardCharsets.UTF_8);
-			System.out.println("random généré : "+tok);
+//			ligneAbsenceRepo.deleteAll();
+//			System.out.println("Success delete ...");
+//			String tok2=UUID.randomUUID().toString().replace("-","#_è");
+//			String tok=tok2+UUID.randomUUID().toString().replace("-","&éàè");
+//			URLEncoder.encode(tok, StandardCharsets.UTF_8);
+//			System.out.println("random généré : "+tok);
 //			try{emailService.sendSimpleEmail(
 //					"bilelbenabdallah31@gmail.com",
 //					"Mise à jour et correctifs sur votre site",

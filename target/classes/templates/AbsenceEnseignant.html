@@ -9,30 +9,98 @@
     <link rel="stylesheet" href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css">
     <script src="/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="/webjars/bootstrap-icons/1.10.5/font/bootstrap-icons.css">
-</head>
-<body>
+    <style>
+        /* Style pour surligner la ligne au survol */
+        .table-td:hover {
+            background-color: greenyellow;
+        }
 
+        /* Style pour la ligne sélectionnée */
+        .selected {
+            background-color: #d3d3d3;
+        }
+    </style>
+</head>
+
+<body>
 <div layout:fragment="content1">
     <div class="container mt-2">
         <div class="card">
             <div class="card-header">
                 <h1>Absences Enseignants</h1>
             </div>
-            <div class="container">
-                <form class="form" method="get" th:action="@{/AbsenceEnseignant}">
-                    <input type="text" placeholder="Rechercher Enseignant" name="keyword" th:value="${keyword}">
-                    <button class="btn btn-outline-light" type="submit">Rechercher</button>
-                </form>
+
+           <div class="container d-flex"> <!-- Champ de recherche -->
+            <div class="dropdown ms-0">
+                <input th:value="${searchKey}" style="border:none" class="form-group dropdown-toggle" oninput="toggleShow1()"
+                       type="text" id="dropdownMenuInput" placeholder="Rechercher Enseignant..."/>
+                <span id="dropDownEns" class="dropdown-menu" style="display: none;">
+                    <table class="table">
+                        <thead>
+
+                        </thead>
+                        <tbody   id="tableEnsBody">
+                            <tr th:each="abs, ind : ${absEns}" class="table-row">
+
+                                <td class="table-td"><a style="text-decoration:none;color:black"
+                                       th:href="@{'/AbsenceEnseignant?keyword=' + ${abs.nomEnseignant}}"
+                                       th:text="${abs.nomEnseignant}"></a></td>
+
+
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </span>
             </div>
+               <form style="margin-left:10%" th:action="@{/AbsenceEnseignant}" method="get">
+                   <div  class="dropdown ms-0">
+                       <select style="border:grey"  name="dep" onchange="this.form.submit()">
+                           <option value="">Choisir Département</option>
+                           <option value="SEG">Gestion</option>
+                           <option value="TI">Informatique</option>
+                           <option value="GP">Génie Procédé</option>
+                           <option value="GM">Génie Mécanique</option>
+                           <option value="GC">Génie Civile</option>
+                       </select>
+                   </div>
+               </form>
+               <form th:action="@{/AbsenceEnseignant}" method="get" style="margin-left:10%">
+                   <label>Début:</label>
+                   <input type="date" name="date1"  th:value="${date1.orElse(null)}" onblur="this.form.submit()" oninput="this.form.submit()">
+
+                   <label>Fin:</label>
+                   <input type="date" name="date2"  th:value="${date2.orElse(null)}" onblur="this.form.submit()" oninput="this.form.submit()">
+               </form>
+
+
+           </div>
+            <!-- Filtrage du dropdown -->
+            <script>
+                function toggleShow1(){
+                    var dropdownMenuInput = document.getElementById('dropdownMenuInput').value.toLowerCase();
+                    var span = document.getElementById('dropDownEns');
+                    var rows = document.querySelectorAll('#tableEnsBody .table-row');
+
+                    span.style.display = (dropdownMenuInput.length > 0) ? "block" : "none";
+
+                    rows.forEach(row => {
+                        const cells = Array.from(row.getElementsByTagName('td'));
+                        const matchFound = cells.some(cell => cell.textContent.toLowerCase().includes(dropdownMenuInput));
+                        row.style.display = matchFound ? "" : "none";
+                    });
+                }
+            </script>
+
             <div class="card-body">
                 <table class="table table-striped">
                     <thead>
                     <tr>
                         <th>Nom de salle</th>
                         <th>Nom Matière</th>
+                        <th>Département</th>
                         <th>Enseignant</th>
                         <th>Nom De Séance</th>
-                        <th>Horaire</th>
                         <th>Année</th>
                         <th>Jour</th>
                         <th>Date</th>
@@ -44,26 +112,39 @@
                     <tr th:each="abs : ${listAbsence}">
                         <td th:text="${abs.nom_salle}"></td>
                         <td th:text="${abs.nom_matiere}"></td>
-                        <td th:text="${abs.ensi1}"></td>
+                        <td th:text="${abs.nomdepfiliere}"></td>
+                        <td th:text="${abs.enseignant.nomEnseignant}"></td>
                         <td th:text="${abs.nom_seance}"></td>
-                        <td th:text="${abs.seanceDouble}"></td>
                         <td th:text="${abs.annee1}"></td>
                         <td th:text="${abs.nom_jour}"></td>
                         <td th:text="${abs.date}"></td>
                         <td th:text="${abs.notified ? 'Oui' : 'Non'}"></td>
                         <td>
-                            <button class="btn btn-primary">Notifier</button>
+                            <button th:class="${abs.notified} ? 'd-none' : 'btn btn-primary'">Notifier</button>
                         </td>
                     </tr>
                     </tbody>
                 </table>
             </div>
+
             <div class="card-footer">
-                <ul class="nav nav-pills">
-                    <li th:each="page, status : ${pages}">
-                        <a th:class="${status.index == currentPage ? 'btn btn-primary m-lg-1' : 'btn btn-outline-primary m-lg-1'}"
-                           th:href="@{/AbsenceEnseignant(page=${status.index}, keyword=${keyword})}"
-                           th:text="${status.index + 1}"></a>
+                <ul class="pagination justify-content-center mb-0">
+                    <!-- Boutons de pagination -->
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/AbsenceEnseignant(page=${0}, keyword=${keyword})}">&laquo;&laquo;</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/AbsenceEnseignant(page=${currentPage - 1}, keyword=${keyword})}">&laquo;</a>
+                    </li>
+                    <li class="page-item" th:each="page, status : ${pages}"
+                        th:class="${status.index == currentPage ? ' active' : 'd-none'}">
+                        <a class="page-link" th:text="${status.index + 1} + ' / ' + ${pages.length}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == pages.length - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/AbsenceEnseignant(page=${currentPage + 1}, keyword=${keyword})}">&raquo;</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == pages.length - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/AbsenceEnseignant(page=${pages.length - 1}, keyword=${keyword})}">&raquo;&raquo;</a>
                     </li>
                 </ul>
             </div>

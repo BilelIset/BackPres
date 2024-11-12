@@ -48,7 +48,7 @@ auth.userDetailsService(new UserDetailsService() {
         http.formLogin().loginPage("/login").defaultSuccessUrl("/default", true);
         http
                 .authorizeRequests()
-                .antMatchers("/login", "https://www.apirest.tech/downloads/**","/CheckPass","/ForgotPassword","/forgot","/reset-password","/default", "/webjars/**", "/smiley.png","/logo.png","/deconnect", "/error").permitAll() // Accès libre
+                .antMatchers("/login","/emploi/creneau", "https://www.apirest.tech/downloads/**","/CheckPass","/ForgotPassword","/forgot","/reset-password","/default", "/webjars/**", "/smiley.png","/logo.png","/deconnect", "/error").permitAll() // Accès libre
                 .antMatchers("/EspaceEnseignant","/AddUserPhoto","/CheckCred","/CheckPoint","/AddUserImg","/AbsenceEtudiant","/saveUser","/EditUser").hasRole("ENSEIGNANT") // ENSEIGNANT pour une page spécifique
                 .antMatchers("/**").hasRole("ADMIN") // ADMIN peut accéder à tout
 

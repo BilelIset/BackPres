@@ -47,8 +47,8 @@ public class EmploiController {
 
 
     @GetMapping(value = "/emploi/creneau")
-    public Boolean getEnsi(@RequestParam String jour,@RequestParam String salle,@RequestParam String seance,@RequestParam String seanceDouble) {
-        List<Emploi> emploi = emploiRepo.trouverCreneau(String.valueOf(calculDate.getSemestre()), jour, salle, seance, seanceDouble);
+    public Boolean getEnsi(@RequestParam String salle) {
+        List<Emploi> emploi = emploiRepo.trouverCreneau("1", "1", salle, "1", "6");
 
 
 
@@ -68,13 +68,14 @@ System.out.println("salle = "+emploi.get(0).getNom_salle()+" seance =  "+emploi.
 
         Boolean notified = false;
 
-            Optional<Ens> ens = enstRepo.findById(emploi.get(0).getEnsi1());
+           Optional<Ens> ens = enstRepo.findById(emploi.get(0).getEnsi1());
 
-            String msg = "Mr " + ens.get().getNomEnseignant() + "On vous informe que vous etes  absent le : " + LocalDate.now() + " à la salle : " + salle + " seances de :" + emploi.get(0).getNom_seance();
+           String msg = "Mr " + ens.get().getNomEnseignant() + "On vous informe que vous etes  absent le : " + LocalDate.now() + " à la salle : " + salle + " seances de :" + emploi.get(0).getNom_seance();
 
 
                 for (Emploi emploi1 : emploi) {
-                    ligneAbsence.setEnsi1(emploi1.getEnsi1());
+                    ligneAbsence.setNomdepfiliere(emploi1.getNomdepfiliere());
+                    ligneAbsence.setEnseignant(ens.get());
                     ligneAbsence.setNom_jour(emploi1.getNom_jour());
                     ligneAbsence.setAnnee1(emploi1.getAnnee1());
                     ligneAbsence.setSemestre1(emploi1.getSemestre1());
@@ -91,7 +92,9 @@ System.out.println("salle = "+emploi.get(0).getNom_salle()+" seance =  "+emploi.
 
                 } catch (Exception ignored) {
 
+
                 }
+                ligneAbsence.setNotified(notified);
                 ligneAbsenceRepo.save(ligneAbsence);
                 System.out.println("ligne absence ajouté" + ligneAbsence.toString());
 

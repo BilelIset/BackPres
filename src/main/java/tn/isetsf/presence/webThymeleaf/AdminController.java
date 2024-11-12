@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -56,6 +57,7 @@ public class AdminController {
     AppUserInterfaceImpl appUserInterface;
 
 
+
     private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
     private final String UPLOAD_DIR = "src/main/resources/static/uploads/";
@@ -83,22 +85,49 @@ public class AdminController {
     public String indexModel(Model model,
                              @RequestParam(value = "page", defaultValue = "0") int page,
                              @RequestParam(value = "size", defaultValue = "5") int size,
-                             @RequestParam(value = "keyword", defaultValue = "") String keyword) {
-        Page<LigneAbsence> absencePage = ligneAbsenceRepo.findByEnsi1Contains(keyword, PageRequest.of(page, size));
-        logger.info("Total pages: {} | Total elements: {}", absencePage.getTotalPages(), absencePage.getTotalElements());
+                             @RequestParam(value = "keyword", defaultValue = "") String keyword,
+                             @RequestParam(value = "dep", defaultValue = "") String dep,
+                             @RequestParam(value = "date1", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> date1,
+                             @RequestParam(value = "date2", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> date2) {
 
-        model.addAttribute("listAbsence", absencePage.getContent());
+        Page<LigneAbsence> absencePage;
+
+        // Cas 1: Filtrage par département uniquement
+        if (!dep.isEmpty()) {
+            absencePage = ligneAbsenceRepo.findByDepartementContaining(dep, PageRequest.of(page, size));
+            model.addAttribute("listAbsence", absencePage.getContent());
+        }
+        // Cas 2: Filtrage par dates
+        else if (date1.isPresent() || date2.isPresent()) {
+            LocalDate startDate = date1.orElse(LocalDate.now().minusDays(30)); // Valeur par défaut si date1 est absente
+            LocalDate endDate = date2.orElse(LocalDate.now()); // Valeur par défaut si date2 est absente
+            absencePage = ligneAbsenceRepo.findByDate(startDate, endDate, PageRequest.of(page, size));
+            model.addAttribute("listAbsence", absencePage.getContent());
+        }
+        // Cas 3: Filtrage par mot-clé uniquement
+        else if (!keyword.isEmpty()) {
+            absencePage = ligneAbsenceRepo.findByEnseignantNomEnseignantContaining(keyword, PageRequest.of(page, size));
+            model.addAttribute("listAbsence", absencePage.getContent());
+        }
+        // Cas par défaut: Tous les enregistrements
+        else {
+            absencePage = ligneAbsenceRepo.findAll(PageRequest.of(page, size));
+            model.addAttribute("listAbsence", absencePage.getContent());
+        }
+
         model.addAttribute("pages", new int[absencePage.getTotalPages()]);
+        model.addAttribute("absEns", enstRepo.findAll());
         model.addAttribute("currentPage", page);
         model.addAttribute("keyword", keyword);
         model.addAttribute("pathCourant", "/AbsenceEnseignant");
-
         model.addAttribute("user", findLogged());
         model.addAttribute("isAdmin", isAdmin());
+        model.addAttribute("date1",date1);
+        model.addAttribute("date2",date2);
 
-
-        return "AbsenceEnseignant"; // Ensure this returns the correct view name
+        return "AbsenceEnseignant"; // Vue à afficher
     }
+
     @GetMapping(path = "/Utilisateurs")
     public String userControl(Model model) {
         model.addAttribute("user", findLogged());
@@ -647,7 +676,7 @@ class VerfPas{
         System.out.println(loggedList);
         model.addAttribute("loggedList", loggedList);
         int notifiedCount = 0;
-        Page<LigneAbsence> absencePage = ligneAbsenceRepo.findByEnsi1Contains(keyword, PageRequest.of(page, size));
+        Page<LigneAbsence> absencePage = ligneAbsenceRepo.findByEnseignantNomEnseignantContaining(keyword, PageRequest.of(page, size));
 
         for (LigneAbsence ligneAbsence : absencePage) {
             if (ligneAbsence.getNotified()) {
@@ -679,11 +708,17 @@ class VerfPas{
         String fullDate = calculDate.JourEnTouteLettre() + "  " + dateNow;
 
         List<LigneAbsence> listNonNotified = ligneAbsenceRepo.findByNotifiedFalse();
-        List<LigneAbsence> listNonNotifier = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
+int index=0;
+if(listNonNotified.size()>4)index=5;
+if(listNonNotified.size()<4)index=listNonNotified.size();
+        if(!listNonNotified.isEmpty()){
+            List<LigneAbsence> listNonNotifier = new ArrayList<>();
+
+            for (int i = 0; i <index; i++) {
             listNonNotifier.add(listNonNotified.get(i));
         }
-        model.addAttribute("listNonNotifier", listNonNotifier);
+            model.addAttribute("listNonNotifier", listNonNotifier);
+        }
         model.addAttribute("dateNow", fullDate);
         model.addAttribute("nbEns", nbEns);
         model.addAttribute("nbSalles", nbSalles);
@@ -696,6 +731,7 @@ class VerfPas{
 
 
         List<Object[]> objectList = ligneAbsenceRepo.countAbsencesByEnseignantNative();
+        System.out.println("Nombre d'absences = "+objectList.toString());
         model.addAttribute("absenceByEnseignant", objectList);
 
         return "Dashboard"; // Ensure this returns the correct view name
@@ -706,7 +742,9 @@ class VerfPas{
     public List<Object[]> getAbsencesByEnseignant() {
         List<Object[]> objectList = ligneAbsenceRepo.countAbsencesByEnseignantNative();
         List<Object[]> objects = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
+        int index=5;
+        if (objectList.size()<5)index=objectList.size();
+        for (int i = 0;i < index; i++) {
             objects.add(objectList.get(i));
         }
 
@@ -714,4 +752,5 @@ class VerfPas{
         return objects;
 
     }
+
 }

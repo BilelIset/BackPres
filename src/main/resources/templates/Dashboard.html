@@ -106,7 +106,7 @@
                         <div class="card mb-2" th:each="abs, status : ${listAbsence}">
                             <div class="card-header bg-info text-light d-flex justify-content-between">
                                 <span th:text="${status.index + 1}"></span>
-                                <span th:text="${abs.ensi1}"></span>
+                                <span th:text="${abs.enseignant.nomEnseignant}"></span>
                                 <span th:text="${abs.nom_salle}"></span>
                             </div>
 
@@ -128,7 +128,7 @@
                         <div class="card mb-2" th:each="abs, status : ${listNonNotifier}">
                             <div class="card-header bg-warning text-light d-flex justify-content-between">
                                 <span th:text="${status.index + 1}"></span>
-                                <span th:text="${abs.ensi1}"></span>
+                                <span th:text="${abs.enseignant.nomEnseignant}"></span>
                                 <span th:text="${abs.nom_salle}"></span>
                                 <span th:text="${abs.nom_seance}"></span>
                             </div>
