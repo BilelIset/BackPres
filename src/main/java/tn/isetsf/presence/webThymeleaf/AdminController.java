@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -44,6 +45,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 @Controller
@@ -87,34 +89,42 @@ public class AdminController {
                              @RequestParam(value = "size", defaultValue = "5") int size,
                              @RequestParam(value = "keyword", defaultValue = "") String keyword,
                              @RequestParam(value = "dep", defaultValue = "") String dep,
-                             @RequestParam(value = "date1", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> date1,
-                             @RequestParam(value = "date2", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> date2) {
+                             @RequestParam(value = "date1", required = false) String date1Str,
+                             @RequestParam(value = "date2", required = false) String date2Str,
+                             @RequestParam(value = "keyword1",defaultValue = "", required = false)String keyword1) {
 
-        Page<LigneAbsence> absencePage;
+        LocalDate date1 = null;
+        LocalDate date2 = null;
 
-        // Cas 1: Filtrage par département uniquement
-        if (!dep.isEmpty()) {
-            absencePage = ligneAbsenceRepo.findByDepartementContaining(dep, PageRequest.of(page, size));
-            model.addAttribute("listAbsence", absencePage.getContent());
+        try {
+            if (date1Str != null && !date1Str.isEmpty()) {
+                date1 = LocalDate.parse(date1Str);
+            } else {
+                date1 = LocalDate.now().minusMonths(1);
+            }
+
+            if (date2Str != null && !date2Str.isEmpty()) {
+                date2 = LocalDate.parse(date2Str);
+            } else {
+                date2 = LocalDate.now();
+            }
+        } catch (DateTimeParseException e) {
+            // Gestion d'une date mal formée (facultatif)
         }
-        // Cas 2: Filtrage par dates
-        else if (date1.isPresent() || date2.isPresent()) {
-            LocalDate startDate = date1.orElse(LocalDate.now().minusDays(30)); // Valeur par défaut si date1 est absente
-            LocalDate endDate = date2.orElse(LocalDate.now()); // Valeur par défaut si date2 est absente
-            absencePage = ligneAbsenceRepo.findByDate(startDate, endDate, PageRequest.of(page, size));
-            model.addAttribute("listAbsence", absencePage.getContent());
-        }
-        // Cas 3: Filtrage par mot-clé uniquement
-        else if (!keyword.isEmpty()) {
-            absencePage = ligneAbsenceRepo.findByEnseignantNomEnseignantContaining(keyword, PageRequest.of(page, size));
-            model.addAttribute("listAbsence", absencePage.getContent());
-        }
-        // Cas par défaut: Tous les enregistrements
-        else {
-            absencePage = ligneAbsenceRepo.findAll(PageRequest.of(page, size));
-            model.addAttribute("listAbsence", absencePage.getContent());
+        if(keyword.equals("")&&!keyword1.isEmpty()){
+            keyword=keyword1;
         }
 
+        Page<LigneAbsence> absencePage = ligneAbsenceRepo.findByEnseignantNomEnseignantContaining(
+                keyword, dep, date1, date2, PageRequest.of(page, size)
+        );
+            keyword1=keyword;
+            keyword="";
+
+
+        model.addAttribute("keyword1",keyword1);
+
+        model.addAttribute("listAbsence", absencePage.getContent());
         model.addAttribute("pages", new int[absencePage.getTotalPages()]);
         model.addAttribute("absEns", enstRepo.findAll());
         model.addAttribute("currentPage", page);
@@ -122,11 +132,13 @@ public class AdminController {
         model.addAttribute("pathCourant", "/AbsenceEnseignant");
         model.addAttribute("user", findLogged());
         model.addAttribute("isAdmin", isAdmin());
-        model.addAttribute("date1",date1);
-        model.addAttribute("date2",date2);
+        model.addAttribute("date1", date1);
+        model.addAttribute("date2", date2);
+        model.addAttribute("dep", dep);
 
         return "AbsenceEnseignant"; // Vue à afficher
     }
+
 
     @GetMapping(path = "/Utilisateurs")
     public String userControl(Model model) {
@@ -676,7 +688,7 @@ class VerfPas{
         System.out.println(loggedList);
         model.addAttribute("loggedList", loggedList);
         int notifiedCount = 0;
-        Page<LigneAbsence> absencePage = ligneAbsenceRepo.findByEnseignantNomEnseignantContaining(keyword, PageRequest.of(page, size));
+        Page<LigneAbsence> absencePage = ligneAbsenceRepo.findByEnseignantNomEnseignantContaining(keyword,"",null,null, PageRequest.of(page, size));
 
         for (LigneAbsence ligneAbsence : absencePage) {
             if (ligneAbsence.getNotified()) {
