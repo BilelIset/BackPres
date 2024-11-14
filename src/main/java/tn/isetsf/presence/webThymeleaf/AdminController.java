@@ -124,6 +124,7 @@ public class AdminController {
 
 
         model.addAttribute("keyword1",keyword1);
+        model.addAttribute("cren",cren);
 
         model.addAttribute("listAbsence", absencePage.getContent());
         model.addAttribute("pages", new int[absencePage.getTotalPages()]);

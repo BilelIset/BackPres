@@ -37,7 +37,8 @@
                         <!-- Champ de recherche par mot-clé -->
                         <div class="col-md-5">
                             <div class="dropdown">
-                                <input name="keyword1" th:value="${keyword1}" placeholder="Filtre Enseignants"
+                                <label style="padding-bottom:2%">Filtre Enseignants</label>
+                                <input  name="keyword1" th:value="${keyword1}" placeholder="Saisir Nom Enseignant.."
                                        class="form-control" oninput="toggleShow1()" type="text" id="dropdownMenuInput"/>
                                 <span id="dropDownEns" class="dropdown-menu w-100" style="display: none;">
                         <table class="table">
@@ -59,10 +60,10 @@
 
                         <!-- Filtre par département -->
                         <div class="col-md-3">
-                            <label class="label" style="padding-bottom:2%">Département</label>
+                            <label class="form-label mb-2">Département</label>
                             <select class="form-select" name="dep" onchange="this.form.submit()">
-                                <option th:value="${dep}" th:text="${dep}"></option>
-                                <option value=''>Tous</option>
+                                <option th:text="${dep}"></option>
+                                <option value="">Tous</option>
                                 <optgroup label="Départements">
                                     <option value="SEG">SEG - Gestion</option>
                                     <option value="TI">TI - Informatique</option>
@@ -72,6 +73,7 @@
                                 </optgroup>
                             </select>
                         </div>
+
 
 
                         <div class="row mb-3 align-items-center"> <!-- Ligne pour les dates -->
@@ -90,15 +92,43 @@
                                    oninput="if(this.value) this.form.submit()">
                         </div>
 
-                        <!-- Bouton de réinitialisation -->
+                            <div class="col-md-3">
+                                <label for="cren" class="form-label">
+                                    Séance
+                                </label>
+                                <select class="form-select" name="cren" id="cren" th:value="${cren}" onchange="this.form.submit()">
+                                  <option th:text="${cren}"></option>
+                                    <option value="">Tous</option>
 
-                    </div>
+                                    <optgroup label="Séance Simple">
+                                        <option value="1">1 - 08h15 à 09h45</option>
+                                        <option value="2">2 - 10h00 à 11h30</option>
+                                        <option value="3">3 - 11h45 à 13h15</option>
+                                        <option value="4">4 - 13h20 à 14h50</option>
+                                        <option value="5">5 - 14h55 à 16h25</option>
+                                        <option value="6">6 - 16h30 à 18h00</option>
+                                    </optgroup>
+
+                                    <optgroup label="Séance Double">
+                                        <option value="7">7 - 08h00 à 11h30</option>
+                                        <option value="8">8 - 10h00 à 13h20</option>
+                                        <option value="9">9 - 11h45 à 14h50</option>
+                                        <option value="10">10 - 13h25 à 16h25</option>
+                                        <option value="11">11 - 14h55 à 18h00</option>
+                                    </optgroup>
+                                </select>
+
+
+                                <!-- Bouton de réinitialisation -->
+
+                            </div></div></div>
                 </form>
                 <div class="col-md-2 d-flex align-items-end">
                     <form th:action="@{/AbsenceEnseignant}" method="get">
                         <input type="hidden" name="keyword" th:value="''" />
                         <input type="hidden" name="dep" th:value="''" />
                         <button class="btn btn-outline-secondary w-100" type="submit">Réinitialiser</button>
+
                     </form>
                 </div>
             </div>
