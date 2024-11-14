@@ -91,7 +91,8 @@ public class AdminController {
                              @RequestParam(value = "dep", defaultValue = "") String dep,
                              @RequestParam(value = "date1", required = false) String date1Str,
                              @RequestParam(value = "date2", required = false) String date2Str,
-                             @RequestParam(value = "keyword1",defaultValue = "", required = false)String keyword1) {
+                             @RequestParam(value = "keyword1",defaultValue = "", required = false)String keyword1,
+                             @RequestParam(value = "cren",defaultValue = "")String cren) {
 
         LocalDate date1 = null;
         LocalDate date2 = null;
@@ -116,7 +117,7 @@ public class AdminController {
         }
 
         Page<LigneAbsence> absencePage = ligneAbsenceRepo.findByEnseignantNomEnseignantContaining(
-                keyword, dep, date1, date2, PageRequest.of(page, size)
+                keyword, dep, date1, date2, cren,PageRequest.of(page, size)
         );
             keyword1=keyword;
             keyword="";
@@ -688,8 +689,7 @@ class VerfPas{
         System.out.println(loggedList);
         model.addAttribute("loggedList", loggedList);
         int notifiedCount = 0;
-        Page<LigneAbsence> absencePage = ligneAbsenceRepo.findByEnseignantNomEnseignantContaining(keyword,"",null,null, PageRequest.of(page, size));
-
+        Page<LigneAbsence> absencePage = ligneAbsenceRepo.findTous(PageRequest.of(page, size));
         for (LigneAbsence ligneAbsence : absencePage) {
             if (ligneAbsence.getNotified()) {
                 notifiedCount++;

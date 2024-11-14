@@ -90,15 +90,38 @@
                                    oninput="if(this.value) this.form.submit()">
                         </div>
 
+                            <div class="col-md-3">
+                                <label for="cren" class="form-label">
+                                    Séance
+                                </label>
+                                <select class="form-select" name="cren" id="cren" th:value="${cren}" onchange="this.form.submit()">
+                                    <optgroup label="Séance Simple">
+                                    <option value="1">1- 08h15 A 09h45</option>
+                                    <option value="2">2- 10h00 A 11h30</option>
+                                    <option value="3">3- 11.45 A 13h15</option>
+                                    <option value="4">4- 13.20 A 14h50</option>
+                                    <option value="5">5- 14h55 A 16h25</option>
+                                        <option value="6">6- 16h30 A 18h00</option></optgroup>
+                                    <optgroup label="Séance Double">
+                                        <option value="7">7- 08h00 A 11h30</option>
+                                        <option value="8">8- 10h00 A 13h20</option>
+                                        <option value="9">9- 11h45 A 14h50</option>
+                                        <option value="10">10- 13h25 A 16h25</option>
+                                        <option value="11">11- 14h55 A 18h00</option>
+
+                                    </optgroup>
+                                </select>
+
                         <!-- Bouton de réinitialisation -->
 
-                    </div>
+                            </div></div></div>
                 </form>
                 <div class="col-md-2 d-flex align-items-end">
                     <form th:action="@{/AbsenceEnseignant}" method="get">
                         <input type="hidden" name="keyword" th:value="''" />
                         <input type="hidden" name="dep" th:value="''" />
                         <button class="btn btn-outline-secondary w-100" type="submit">Réinitialiser</button>
+
                     </form>
                 </div>
             </div>

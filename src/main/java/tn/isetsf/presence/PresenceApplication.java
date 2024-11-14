@@ -120,9 +120,9 @@ public class PresenceApplication {
 //			URLEncoder.encode(tok, StandardCharsets.UTF_8);
 //			System.out.println("random généré : "+tok);
 //			try{emailService.sendSimpleEmail(
-//					"bilelbenabdallah31@gmail.com",
+//					"nissen.masmoudi@gmail.com",
 //					"Mise à jour et correctifs sur votre site",
-//					"Bonjour Mr Nissen,\n\nNous avons récemment apporté des correctifs et ajouté de nouvelles fonctionnalités au site https://www.apirest.tech. Nous vous invitons à visiter le site avec vos  paramètres crédentiels pour découvrir ces améliorations et nous faire part de vos retours et on vous invite à accéder aussi avec le role ENSEIGNANT login=user23 avec mdp=12345.\n\nCordialement,\nL'équipe technique."
+//					"Bonjour Mr Nissen,\n\nNous avons récemment apporté des correctifs et ajouté de nouvelles fonctionnalités au site https://www.apirest.tech. Nous vous invitons à visiter le site avec vos  paramètres crédentiels pour découvrir ces améliorations et nous faire part de vos retours.\n\nCordialement,\nL'équipe technique."
 //			);
 //			System.out.println("Success d'envoie de l'email");
 //			}catch (Exception e){
